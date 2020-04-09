@@ -86,7 +86,7 @@ public class Template {
             JExcel.JExcel.removeRows(sheet, 1, sheet.getLastRowNum());
         }
 
-        for (LctoTemplate lcto : lctos) {
+        lctos.forEach((lcto) -> {
             boolean valid = mes > 0 && ano > 0 ? validateDate(lcto.getData()) : true;
             if (valid) {
                 XSSFRow row = sheet.createRow(sheet.getLastRowNum() + 1);
@@ -105,7 +105,7 @@ public class Template {
                 row.getCell(6).setCellValue(lcto.getValor().getDouble());
                 row.getCell(7).setCellValue(lcto.getEntrada_Saida());
             }
-        }
+        });
     }
 
     private boolean validateDate(String date) {
