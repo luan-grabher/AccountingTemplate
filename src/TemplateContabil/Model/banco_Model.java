@@ -6,7 +6,7 @@ import Entity.ErroIgnorar;
 import LctoTemplate.CfgBancoTemplate;
 import OFX.OFX;
 import Robo.View.roboView;
-import SelectorOS.Entity.FiltroString;
+import Selector.Entity.FiltroString;
 import TemplateContabil.Control.ControleTemplates;
 import TemplateContabil.Template;
 import java.io.File;
@@ -55,7 +55,7 @@ public class banco_Model {
 
         filtroBanco = new FiltroString(cfgBanco.getFiltroNomeArquivoOriginal());
 
-        arquivoBanco = SelectorOS.Pasta.procura_arquivo(
+        arquivoBanco = Selector.Pasta.procura_arquivo(
                 banco_Model.fileExtratos,
                 filtroBanco.getListPossuiStr(";"),
                 filtroBanco.getListNaoPossuiStr(";")

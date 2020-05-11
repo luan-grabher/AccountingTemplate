@@ -5,7 +5,7 @@ import Entity.Aviso;
 import Entity.Executavel;
 import LctoTemplate.CfgBancoTemplate;
 import Robo.View.roboView;
-import SelectorOS.Entity.FiltroString;
+import Selector.Entity.FiltroString;
 import TemplateContabil.ComparacaoTemplates;
 import TemplateContabil.Model.Entity.CfgTipoLctosBancoModel;
 import TemplateContabil.Model.ExtratoExcel;
@@ -123,7 +123,7 @@ public class ControleTemplates {
         @Override
         public void run() {
             System.out.println("Definindo o template padrão");
-            fileTemplatePadrao = SelectorOS.Pasta.procura_arquivo(
+            fileTemplatePadrao = Selector.Pasta.procura_arquivo(
                     fileEscrituracaoMensal,
                     filtroTemplatePadrao.getListPossuiStr(";"),
                     filtroTemplatePadrao.getListNaoPossuiStr(";")
@@ -236,7 +236,7 @@ public class ControleTemplates {
             lctos = getLctosFromFile(modelo.getArquivoBanco(), cfgTipoLctos);
 
             if (cfgTipoLctosComparar.getTIPO() != CfgTipoLctosBancoModel.TIPO_INATIVO) {
-                File fileComparar = SelectorOS.Pasta.procura_arquivo(filePathPrincipalArquivos, filtroFileComparar);
+                File fileComparar = Selector.Pasta.procura_arquivo(filePathPrincipalArquivos, filtroFileComparar);
                 if (fileComparar != null) {
                     lctosComparados = getLctosFromFile(modelo.getArquivoBanco(), cfgTipoLctosComparar);
                     resultadoComparacao = ComparacaoTemplates.getComparacaoString(nomeBanco, fileComparar.getName(), lctos, lctosComparados);
