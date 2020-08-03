@@ -85,7 +85,10 @@ public class ExtratoExcel {
                             if (colunaPreTexto.contains("#")) {
                                 preTexto = colunaPreTexto.replaceAll("#", "");
                             } else {
-                                preTexto = JExcel.getStringCell(row.getCell(JExcel.Cell(colunaPreTexto)));
+                                Cell cell = row.getCell(JExcel.Cell(colunaPreTexto));
+                                if(cell != null){
+                                    preTexto = JExcel.getStringCell(cell);
+                                }                                
                             }
                         }
 
@@ -98,8 +101,12 @@ public class ExtratoExcel {
                                         sbComplemento.append(" - ");
                                     }
 
-                                    String celComplementoString = JExcel.getStringCell(row.getCell(JExcel.Cell(colunaComplemento)));
-                                    sbComplemento.append(celComplementoString);
+                                    Cell cell = row.getCell(JExcel.Cell(colunaComplemento));
+                                    
+                                    if(cell != null){
+                                        String celComplementoString = JExcel.getStringCell(cell);
+                                        sbComplemento.append(celComplementoString);
+                                    }
                                 }
                             }
 
@@ -120,8 +127,8 @@ public class ExtratoExcel {
                             exitString = exitString.replaceAll("\\.", "").replaceAll("\\,", ".");
 
                             //Tenta criar a variável de valor
-                            BigDecimal entryBD = new BigDecimal(entryString);
-                            BigDecimal exitBD = new BigDecimal(exitString);
+                            BigDecimal entryBD = new BigDecimal(entryString.equals("")?"0":entryString);
+                            BigDecimal exitBD = new BigDecimal(exitString.equals("")?"0":exitString);
 
                             //Se a coluna tiver que multiplicar por -1 e o valor encontrado for maior que zero
                             if (colunaSaida.contains("-") && exitBD.compareTo(BigDecimal.ZERO) > 0) {
