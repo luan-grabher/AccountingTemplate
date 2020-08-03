@@ -2,7 +2,7 @@ package TemplateContabil.Model;
 
 import Auxiliar.LctoTemplate;
 import Auxiliar.Valor;
-import Entity.ErroIgnorar;
+import Entity.ErrorIgnore;
 import JExcel.JExcel;
 import Robo.View.roboView;
 import java.io.File;
@@ -49,7 +49,7 @@ public class ExtratoExcel {
             wk.close();
         } catch (Exception e) {
             e.printStackTrace();
-            throw new ErroIgnorar("Ocorreu um erro inesperado ao tentar extrair os lançamentos do arquivo " + roboView.link(arquivo));
+            throw new ErrorIgnore("Ocorreu um erro inesperado ao tentar extrair os lançamentos do arquivo " + roboView.link(arquivo));
         }
     }
 

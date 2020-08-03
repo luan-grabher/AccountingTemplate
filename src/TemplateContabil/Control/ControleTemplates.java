@@ -1,8 +1,8 @@
 package TemplateContabil.Control;
 
 import Auxiliar.LctoTemplate;
-import Entity.Aviso;
 import Entity.Executavel;
+import Entity.Warning;
 import LctoTemplate.CfgBancoTemplate;
 import Robo.View.roboView;
 import Selector.Entity.FiltroString;
@@ -120,6 +120,10 @@ public class ControleTemplates {
 
     public class definirFileTemplatePadrao extends Executavel {
 
+        public definirFileTemplatePadrao() {
+            name = "Definindo o template padrão";
+        }
+        
         @Override
         public void run() {
             System.out.println("Definindo o template padrão");
@@ -134,11 +138,6 @@ public class ControleTemplates {
             } else {
                 throw new Error("Template padrão (" + filtroTemplatePadrao.getListPossuiStr(" ") + ") não enconrado em " + roboView.link(fileEscrituracaoMensal));
             }
-        }
-
-        @Override
-        public String getNome() {
-            return "Definindo o template padrão";
         }
 
     }
@@ -194,7 +193,7 @@ public class ControleTemplates {
         }
 
         @Override
-        public String getNome() {
+        public String getName() {
             return "Importando Banco " + this.nomeBanco;
         }
 
@@ -225,7 +224,7 @@ public class ControleTemplates {
             modelo.importarBanco(mostrarAvisoFinalImportacao, cfgBanco.isFiltrarMesAno());
             
             if(!mostrarAvisoFinalImportacao){
-                throw new Aviso("Comparação: " + resultadoComparacao);
+                throw new Warning("Comparação: " + resultadoComparacao);
             }
         }
 

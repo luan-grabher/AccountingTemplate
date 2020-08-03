@@ -1,8 +1,8 @@
 package TemplateContabil.Model;
 
 import Auxiliar.LctoTemplate;
-import Entity.Aviso;
-import Entity.ErroIgnorar;
+import Entity.Warning;
+import Entity.ErrorIgnore;
 import LctoTemplate.CfgBancoTemplate;
 import OFX.OFX;
 import Robo.View.roboView;
@@ -64,7 +64,7 @@ public class banco_Model {
 
     public void verificarArquivo() {
         if (arquivoBanco == null) {
-            throw new ErroIgnorar("Arquivo com '" + filtroBanco.getPossui() + "' e sem '" + filtroBanco.getNaoPossui()
+            throw new ErrorIgnore("Arquivo com '" + filtroBanco.getPossui() + "' e sem '" + filtroBanco.getNaoPossui()
                     + "' no nome não encontrado na pasta " + roboView.link(fileExtratos));
         }
     }
@@ -121,10 +121,10 @@ public class banco_Model {
 
         if (template.isResult()) {
             if (exibirAvisoFinal) {
-                throw new Aviso("Template do banco " + cfgBanco.getNomeBanco() + " salvo em " + roboView.link(fileExtratos));
+                throw new Warning("Template do banco " + cfgBanco.getNomeBanco() + " salvo em " + roboView.link(fileExtratos));
             }
         } else {
-            throw new ErroIgnorar("Erro ao salvar o template do banco '" + cfgBanco.getNomeBanco() + "' na pasta " + roboView.link(fileExtratos));
+            throw new ErrorIgnore("Erro ao salvar o template do banco '" + cfgBanco.getNomeBanco() + "' na pasta " + roboView.link(fileExtratos));
         }
     }
 
