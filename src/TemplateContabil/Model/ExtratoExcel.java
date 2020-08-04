@@ -123,7 +123,7 @@ public class ExtratoExcel {
                             String exitString = exitCell != null ? JExcel.getStringCell(exitCell) : "0";
 
                             //Remove pontos
-                            entryString = entryString.replaceAll("\\.", "").replaceAll("\\,", "");
+                            entryString = entryString.replaceAll("\\.", "").replaceAll("\\,", ".");
                             exitString = exitString.replaceAll("\\.", "").replaceAll("\\,", ".");
 
                             //Tenta criar a variável de valor
