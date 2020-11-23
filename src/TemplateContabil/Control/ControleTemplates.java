@@ -5,11 +5,12 @@ import Entity.Executavel;
 import Entity.Warning;
 import LctoTemplate.CfgBancoTemplate;
 import Robo.View.roboView;
-import Selector.Entity.FiltroString;
 import TemplateContabil.ComparacaoTemplates;
 import TemplateContabil.Model.Entity.CfgTipoLctosBancoModel;
 import TemplateContabil.Model.ExtratoExcel;
 import TemplateContabil.Model.banco_Model;
+import fileManager.Selector;
+import fileManager.StringFilter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class ControleTemplates {
     
     protected String defaultMainPath = "Extratos";
 
-    protected FiltroString filtroTemplatePadrao = new FiltroString("Template;Extratos;.xlsm");
+    protected StringFilter filtroTemplatePadrao = new StringFilter("Template;Extratos;.xlsm");
 
     /**
      * Define um controle com a pasta indicada.\n
@@ -114,7 +115,7 @@ public class ControleTemplates {
         return fileTemplatePadrao;
     }
 
-    public void setFiltroTemplatePadrao(FiltroString filtroTemplatePadrao) {
+    public void setFiltroTemplatePadrao(StringFilter filtroTemplatePadrao) {
         this.filtroTemplatePadrao = filtroTemplatePadrao;
     }
 
@@ -127,16 +128,20 @@ public class ControleTemplates {
         @Override
         public void run() {
             System.out.println("Definindo o template padrão");
-            fileTemplatePadrao = Selector.Pasta.procura_arquivo(
+            fileTemplatePadrao = Selector.getFileOnFolder(
                     fileEscrituracaoMensal,
-                    filtroTemplatePadrao.getListPossuiStr(";"),
-                    filtroTemplatePadrao.getListNaoPossuiStr(";")
+                    filtroTemplatePadrao.printMap(filtroTemplatePadrao.getHas(), ";"),
+                    filtroTemplatePadrao.printMap(filtroTemplatePadrao.getHasNot(), ";")
             );
 
             if (fileTemplatePadrao != null) {
                 definirVariaveisEstaticasModeloBanco();
             } else {
-                throw new Error("Template padrão (" + filtroTemplatePadrao.getListPossuiStr(" ") + ") não enconrado em " + roboView.link(fileEscrituracaoMensal));
+                throw new Error("Template padrão (" 
+                        + filtroTemplatePadrao.printMap(filtroTemplatePadrao.getHas(), " ") 
+                        + ") que não possua (" 
+                        + filtroTemplatePadrao.printMap(filtroTemplatePadrao.getHasNot(), " ")
+                        + ") no nome, não enconrado em " + roboView.link(fileEscrituracaoMensal));
             }
         }
 
@@ -235,7 +240,7 @@ public class ControleTemplates {
             lctos = getLctosFromFile(modelo.getArquivoBanco(), cfgTipoLctos);
 
             if (cfgTipoLctosComparar.getTIPO() != CfgTipoLctosBancoModel.TIPO_INATIVO) {
-                File fileComparar = Selector.Pasta.procura_arquivo(filePathPrincipalArquivos, filtroFileComparar);
+                File fileComparar = Selector.getFileOnFolder(filePathPrincipalArquivos, filtroFileComparar, "");
                 if (fileComparar != null) {
                     lctosComparados = getLctosFromFile(modelo.getArquivoBanco(), cfgTipoLctosComparar);
                     resultadoComparacao = ComparacaoTemplates.getComparacaoString(nomeBanco, fileComparar.getName(), lctos, lctosComparados);

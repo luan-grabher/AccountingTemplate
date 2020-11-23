@@ -6,9 +6,10 @@ import Entity.ErrorIgnore;
 import LctoTemplate.CfgBancoTemplate;
 import OFX.OFX;
 import Robo.View.roboView;
-import Selector.Entity.FiltroString;
 import TemplateContabil.Control.ControleTemplates;
 import TemplateContabil.Template;
+import fileManager.Selector;
+import fileManager.StringFilter;
 import java.io.File;
 import java.util.List;
 
@@ -46,25 +47,28 @@ public class banco_Model {
     }
 
     protected CfgBancoTemplate cfgBanco;
-    protected FiltroString filtroBanco;
+    protected StringFilter filtroBanco;
     protected File arquivoBanco;
     protected List<LctoTemplate> lctos;
 
     public banco_Model(CfgBancoTemplate cfgBanco) {
         this.cfgBanco = cfgBanco;
 
-        filtroBanco = new FiltroString(cfgBanco.getFiltroNomeArquivoOriginal());
+        filtroBanco = new StringFilter(cfgBanco.getFiltroNomeArquivoOriginal());
 
-        arquivoBanco = Selector.Pasta.procura_arquivo(
+        arquivoBanco = Selector.getFileOnFolder(
                 banco_Model.fileExtratos,
-                filtroBanco.getListPossuiStr(";"),
-                filtroBanco.getListNaoPossuiStr(";")
+                filtroBanco.printMap(filtroBanco.getHas(), ";"),
+                filtroBanco.printMap(filtroBanco.getHasNot(), ";")
         );
     }
 
     public void verificarArquivo() {
         if (arquivoBanco == null) {
-            throw new ErrorIgnore("Arquivo com '" + filtroBanco.getPossui() + "' e sem '" + filtroBanco.getNaoPossui()
+            throw new ErrorIgnore("Arquivo com '" 
+                    + filtroBanco.printMap(filtroBanco.getHas(), " ") 
+                    + "' e sem '" 
+                    + filtroBanco.printMap(filtroBanco.getHasNot(), ";")
                     + "' no nome não encontrado na pasta " + roboView.link(fileExtratos));
         }
     }
