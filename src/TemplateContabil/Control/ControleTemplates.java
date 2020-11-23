@@ -27,7 +27,7 @@ public class ControleTemplates {
     protected String pathPrincipalArquivos;
     protected File filePathPrincipalArquivos;
     protected File fileEscrituracaoMensal;
-    protected File fileTemplatePadrao;
+    protected final File fileTemplatePadrao = new File("\\\\heimerdinger\\docs\\Informatica\\Programas\\Moresco\\Robos\\Contabilidade\\TemplateImportacao\\Default.xlsm");
     
     protected String defaultMainPath = "Extratos";
 
@@ -117,34 +117,6 @@ public class ControleTemplates {
 
     public void setFiltroTemplatePadrao(StringFilter filtroTemplatePadrao) {
         this.filtroTemplatePadrao = filtroTemplatePadrao;
-    }
-
-    public class definirFileTemplatePadrao extends Executavel {
-
-        public definirFileTemplatePadrao() {
-            name = "Definindo o template padrão";
-        }
-        
-        @Override
-        public void run() {
-            System.out.println("Definindo o template padrão");
-            fileTemplatePadrao = Selector.getFileOnFolder(
-                    fileEscrituracaoMensal,
-                    filtroTemplatePadrao.printMap(filtroTemplatePadrao.getHas(), ";"),
-                    filtroTemplatePadrao.printMap(filtroTemplatePadrao.getHasNot(), ";")
-            );
-
-            if (fileTemplatePadrao != null) {
-                definirVariaveisEstaticasModeloBanco();
-            } else {
-                throw new Error("Template padrão (" 
-                        + filtroTemplatePadrao.printMap(filtroTemplatePadrao.getHas(), " ") 
-                        + ") que não possua (" 
-                        + filtroTemplatePadrao.printMap(filtroTemplatePadrao.getHasNot(), " ")
-                        + ") no nome, não enconrado em " + roboView.link(fileEscrituracaoMensal));
-            }
-        }
-
     }
 
     public class importacaoPadraoBanco extends Executavel {
