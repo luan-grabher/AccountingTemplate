@@ -1,6 +1,6 @@
 package TemplateContabil;
 
-import Auxiliar.LctoTemplate;
+import TemplateContabil.Model.Entity.LctoTemplate;
 import java.io.File;
 import java.util.List;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -9,77 +9,73 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class Template {
 
-    private File arquivoTemplate;
-    private File salvarEm;
-    private int nroEmpresa;
-    private int nroFilial;
-    private int HPDeb;
-    private int HPCred;
-    private int nroBanco;
-    private List<LctoTemplate> lctos;
+    public static final File templateParaCopiar = new File("\\\\heimerdinger\\docs\\Informatica\\Programas\\Moresco\\Robos\\Contabilidade\\TemplateImportacao\\Default.xlsm");
+    private final File salvarTemplateComo;
+    private final String idConfig;
+    private final List<LctoTemplate> lctos;
 
-    private int mes;
-    private int ano;
-    
-    private boolean result = true;
+    private final int mes;
+    private final int ano;
 
-    public Template(File arquivoTemplate, File salvarEm, int nroEmpresa, int nroFilial, int HPDeb, int HPCred, int nroBanco, List<LctoTemplate> lctos) {
-        constructor(0, 0, arquivoTemplate, salvarEm, nroEmpresa, nroFilial, HPDeb, HPCred, nroBanco, lctos);
-    }
-
-    public Template(int mes, int ano, File arquivoTemplate, File salvarEm, int nroEmpresa, int nroFilial, int HPDeb, int HPCred, int nroBanco, List<LctoTemplate> lctos) {
-        constructor(mes, ano, arquivoTemplate, salvarEm, nroEmpresa, nroFilial, HPDeb, HPCred, nroBanco, lctos);
-    }
-
-    public boolean isResult() {
-        return result;
-    }
-    
-    private void constructor(int mes, int ano, File arquivoTemplate, File salvarEm, int nroEmpresa, int nroFilial, int HPDeb, int HPCred, int nroBanco, List<LctoTemplate> lctos) {
+    /**
+     * Inicia classe que cria o template com os lançamentos a partir do template
+     * para copiar, que deverá ser o padrao.Irá copiar o id da configuração,
+     * quando abrir o xlsm irá se virar com o resto.
+     *
+     *
+     * @param mes Mês para validar, os lançamentos que não forem deste mes não
+     * serão colocados. Para não veriricar deixar como 0.
+     * @param ano Ano para validar, os lançamentos que não forem deste mes não
+     * serão colocados. Para não veriricar deixar como 0.
+     * @param salvarTemplateComo File do template que será salvo, este file não
+     * precisa existir.
+     * @param idConfig Id da configuração na pasta do G
+     * @param lctos Lista de lançamentos do template que serão colados no
+     * template salvo
+     *
+     */
+    public Template(int mes, int ano, File salvarTemplateComo, String idConfig, List<LctoTemplate> lctos) {
         this.mes = mes;
         this.ano = ano;
-        this.arquivoTemplate = arquivoTemplate;
-        this.salvarEm = salvarEm;
-        this.nroEmpresa = nroEmpresa;
-        this.nroFilial = nroFilial;
-        this.HPDeb = HPDeb;
-        this.HPCred = HPCred;
-        this.nroBanco = nroBanco;
+        this.salvarTemplateComo = salvarTemplateComo;
+        this.idConfig = idConfig;
         this.lctos = lctos;
-
-        colocarLctosNoTemplate();
     }
 
-    private void colocarLctosNoTemplate() {
+    /**
+     * Cria template copiando o padrão e coloca os lançamentos e id de configuração nele
+     * 
+     * @return Retorna se ocorreu tudo certo
+     */
+    public boolean criarTemplateXlsm() {
         try {
             //Abrir template
-            XSSFWorkbook wk = new XSSFWorkbook(arquivoTemplate);
+            XSSFWorkbook wk = new XSSFWorkbook(templateParaCopiar);
 
-            definirParametrosGerais(wk.getSheet("Parâmetros Gerais"));
+            colarIdConfigs(wk.getSheet("Parâmetros Gerais"));
             transferirLctos(wk.getSheet("Dados"));
 
             //salvar
             //wk.close();
-            result = JExcel.JExcel.saveWorkbookAs(salvarEm, wk);
+            return JExcel.JExcel.saveWorkbookAs(salvarTemplateComo, wk);
         } catch (Exception e) {
             System.out.println("Erro: " + e);
             e.printStackTrace();
-            result = false;
+            return false;
         }
-
     }
 
-    private void definirParametrosGerais(XSSFSheet sheet) {
-        //Empresa
-        sheet.getRow(1).getCell(1).setCellValue(nroEmpresa);
-        sheet.getRow(2).getCell(3).setCellValue(salvarEm.getParentFile().getAbsolutePath());
-
-        sheet.getRow(5).getCell(1).setCellValue(HPDeb);
-        sheet.getRow(5).getCell(2).setCellValue(HPCred);
-
-        sheet.getRow(7).getCell(3).setCellValue(nroBanco);
+    /**
+     * Coloca o id da dconfiguração na aba de parametros
+     */
+    private void colarIdConfigs(XSSFSheet sheet) {
+        //Cola Id
+        sheet.getRow(4).getCell(1).setCellValue(idConfig);
     }
 
+    /**
+     * Coloca lançamentos na aba de dados
+     */
     private void transferirLctos(XSSFSheet sheet) {
         //Limpa linhas 
         while (sheet.getLastRowNum() > 1) {
@@ -99,15 +95,16 @@ public class Template {
                 row.getCell(0).setCellValue(lcto.getData());
                 row.getCell(1).setCellValue(lcto.getDocumento());
                 row.getCell(2).setCellValue(lcto.getHistorico());
-                if (nroFilial != 0) {
-                    row.getCell(3).setCellValue(nroFilial);
-                }
                 row.getCell(6).setCellValue(lcto.getValor().getDouble());
                 row.getCell(7).setCellValue(lcto.getEntrada_Saida());
             }
         });
     }
 
+    /**
+     * Retorna se uma data é valida
+     * @return Retorna se uma data é valida
+     */
     private boolean validateDate(String date) {
         try {
             String mesBarra = "/" + mes + "/";

@@ -1,6 +1,6 @@
 package TemplateContabil;
 
-import Auxiliar.LctoTemplate;
+import TemplateContabil.Model.Entity.LctoTemplate;
 import Auxiliar.Valor;
 import java.math.BigDecimal;
 import java.math.RoundingMode;

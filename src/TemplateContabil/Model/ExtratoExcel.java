@@ -1,6 +1,6 @@
 package TemplateContabil.Model;
 
-import Auxiliar.LctoTemplate;
+import TemplateContabil.Model.Entity.LctoTemplate;
 import Auxiliar.Valor;
 import Entity.ErrorIgnore;
 import JExcel.JExcel;
@@ -29,15 +29,7 @@ public class ExtratoExcel {
         return lctos;
     }
 
-    public void setLctos(String colunaData, String colunaDoc, String colunaPreTexto, String colunasHistorico, String colunaEntrada, String colunaSaida) {
-        setLctos(colunaData, colunaDoc, colunaPreTexto, colunasHistorico, colunaEntrada, colunaSaida, "");
-    }
-
-    public void setLctos(String colunaData, String colunaDoc, String colunaPreTexto, String colunasHistorico, String colunaValor) {
-        setLctos(colunaData, colunaDoc, colunaPreTexto, colunasHistorico, "", "", colunaValor);
-    }
-
-    private void setLctos(String colunaData, String colunaDoc, String colunaPreTexto, String colunasHistorico, String colunaEntrada, String colunaSaida, String colunaValor) {
+    public void setLctos(String colunaData, String colunaDoc, String colunaPreTexto, String colunasHistorico, String colunaEntrada, String colunaSaida, String colunaValor) {
         try {
             System.out.println("Definindo workbook de " + arquivo.getName());
             wk = new XSSFWorkbook(arquivo);

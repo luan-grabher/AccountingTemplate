@@ -2,7 +2,7 @@ package TemplateContabil.Model.Entity;
 
 import java.io.File;
 
-public class CfgTipoLctosBancoModel {
+public class CfgImportacaoLancamentos {
 
     public final static int TIPO_INATIVO = -1;
     public final static int TIPO_OFX = 0;
@@ -10,7 +10,12 @@ public class CfgTipoLctosBancoModel {
 
     protected int TIPO = TIPO_OFX;
 
-    protected File file =  new File("");
+    private File file =  new File("");
+    private String nome;
+    
+    /**
+     *  Criar mapa de colunas em String
+     */
     protected String excel_colunaData = "";
     protected String excel_colunaDoc = "";
     protected String excel_colunaPreTexto = "";
@@ -19,12 +24,20 @@ public class CfgTipoLctosBancoModel {
     protected String excel_colunaSaida = "";
     protected String excel_colunaValor = "";
 
-    public CfgTipoLctosBancoModel() {
+    public CfgImportacaoLancamentos() {
     }
 
-    public CfgTipoLctosBancoModel(int tipo) {
+    public CfgImportacaoLancamentos(int tipo) {
         TIPO = tipo;
     }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }        
 
     public File getFile() {
         return file;
@@ -98,7 +111,7 @@ public class CfgTipoLctosBancoModel {
         this.excel_colunaValor = excel_colunaValor;
     }
 
-    public CfgTipoLctosBancoModel(String excel_colunaData, String excel_colunaDoc, String excel_colunaPreTexto, String excel_colunaComplementoHistorico, String excel_colunaEntrada, String excel_colunaSaida, String excel_colunaValor) {
+    public CfgImportacaoLancamentos(String excel_colunaData, String excel_colunaDoc, String excel_colunaPreTexto, String excel_colunaComplementoHistorico, String excel_colunaEntrada, String excel_colunaSaida, String excel_colunaValor) {
         this.excel_colunaData = excel_colunaData;
         this.excel_colunaDoc = excel_colunaDoc;
         this.excel_colunaPreTexto = excel_colunaPreTexto;
