@@ -29,6 +29,17 @@ public class ExtratoExcel {
         return lctos;
     }
 
+    /**
+     * Adiciona os lançamentos do arquivo Excel com base nas colunas passadas.
+     *
+     * @param colunaData
+     * @param colunaDoc
+     * @param colunaPreTexto
+     * @param colunaValor
+     * @param colunaEntrada
+     * @param colunasHistorico
+     * @param colunaSaida
+     */
     public void setLctos(String colunaData, String colunaDoc, String colunaPreTexto, String colunasHistorico, String colunaEntrada, String colunaSaida, String colunaValor) {
         try {
             System.out.println("Definindo workbook de " + arquivo.getName());
@@ -45,6 +56,21 @@ public class ExtratoExcel {
         }
     }
 
+    /**
+     * Adiciona os lançamentos do arquivo Excel com base nas colunas passadas. A
+     * sheet e workbook ja devem estar definidos
+     *
+     * @param colunaData
+     * @param colunaDoc
+     * @param colunaPreTexto Para definir um pretexto bruto ao invés de uma
+     * coluna coloque "#" na frente
+     * @param colunasHistorico Coloque as colunas que compoem o historico
+     * separados por ";" na ordem em que aparecem
+     * @param colunaEntrada coluna com valores de entrada
+     * @param colunaSaida coluna com valores de saida
+     * @param colunaValor Coluna que possui valores de entrada e saida(com sinal
+     * -)
+     */
     private void setLctosFromSheet(String colunaData, String colunaDoc, String colunaPreTexto, String colunasHistorico, String colunaEntrada, String colunaSaida, String colunaValor) {
         //Separa as colunas de historico
         String[] colunasComplemento = colunasHistorico.split(";");
@@ -78,9 +104,9 @@ public class ExtratoExcel {
                                 preTexto = colunaPreTexto.replaceAll("#", "");
                             } else {
                                 Cell cell = row.getCell(JExcel.Cell(colunaPreTexto));
-                                if(cell != null){
+                                if (cell != null) {
                                     preTexto = JExcel.getStringCell(cell);
-                                }                                
+                                }
                             }
                         }
 
@@ -94,8 +120,8 @@ public class ExtratoExcel {
                                     }
 
                                     Cell cell = row.getCell(JExcel.Cell(colunaComplemento));
-                                    
-                                    if(cell != null){
+
+                                    if (cell != null) {
                                         String celComplementoString = JExcel.getStringCell(cell);
                                         sbComplemento.append(celComplementoString);
                                     }
@@ -119,8 +145,8 @@ public class ExtratoExcel {
                             exitString = exitString.replaceAll("\\.", "").replaceAll("\\,", ".");
 
                             //Tenta criar a variável de valor
-                            BigDecimal entryBD = new BigDecimal(entryString.equals("")?"0":entryString);
-                            BigDecimal exitBD = new BigDecimal(exitString.equals("")?"0":exitString);
+                            BigDecimal entryBD = new BigDecimal(entryString.equals("") ? "0" : entryString);
+                            BigDecimal exitBD = new BigDecimal(exitString.equals("") ? "0" : exitString);
 
                             //Se a coluna tiver que multiplicar por -1 e o valor encontrado for maior que zero
                             if (colunaSaida.contains("-") && exitBD.compareTo(BigDecimal.ZERO) > 0) {

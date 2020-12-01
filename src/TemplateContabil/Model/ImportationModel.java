@@ -92,7 +92,7 @@ public class ImportationModel {
      *
      * Ai meu parceiro, este é modelo da importacao, e o cfgimportacao vai virar
      * só importação. A classe importação vai guardar os lançamentos. A classe
-     * importacao vasi usar mapa para as colunas. Esse modelo vai receber o mês.
+     * importacao vai usar mapa para as colunas. Esse modelo vai receber o mês.
      * A classe importacao vai guardar o id de configuracao
      *
      *
