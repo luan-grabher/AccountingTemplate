@@ -1,4 +1,4 @@
-package TemplateContabil;
+package TemplateContabil.Model;
 
 import TemplateContabil.Model.Entity.LctoTemplate;
 import Auxiliar.Valor;

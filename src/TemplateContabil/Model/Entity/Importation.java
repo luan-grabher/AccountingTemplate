@@ -1,10 +1,12 @@
 package TemplateContabil.Model.Entity;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
 
-public class CfgImportacaoLancamentos {
+public class Importation {
 
     public final static int TIPO_INATIVO = -1;
     public final static int TIPO_OFX = 0;
@@ -14,17 +16,19 @@ public class CfgImportacaoLancamentos {
 
     private File file = new File("");
     private String nome = "";
+    private String idTemplateConfig;
     private final Map<String, String> excelCols = new HashMap<>();
+    private final List<LctoTemplate> lctos = new ArrayList<>();
 
     /**
      * Cria classe de configuração de lançamentos. Por padrão o tipo de
      * importação é OFX
      */
-    public CfgImportacaoLancamentos() {
+    public Importation() {
         TIPO = TIPO_OFX;
     }
 
-    public CfgImportacaoLancamentos(int tipo) {
+    public Importation(int tipo) {
         TIPO = tipo;
     }
 
@@ -61,5 +65,17 @@ public class CfgImportacaoLancamentos {
      */
     public Map<String, String> getExcelCols() {
         return excelCols;
+    }
+
+    public List<LctoTemplate> getLctos() {
+        return lctos;
+    }
+
+    public String getIdTemplateConfig() {
+        return idTemplateConfig;
+    }
+
+    public void setIdTemplateConfig(String idTemplateConfig) {
+        this.idTemplateConfig = idTemplateConfig;
     }
 }

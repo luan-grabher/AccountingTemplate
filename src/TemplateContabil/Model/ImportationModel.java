@@ -8,10 +8,8 @@ package TemplateContabil.Model;
 import Entity.ErrorIgnore;
 import Entity.Warning;
 import Robo.View.roboView;
-import TemplateContabil.ComparacaoTemplates;
-import TemplateContabil.Model.Entity.CfgImportacaoLancamentos;
+import TemplateContabil.Model.Entity.Importation;
 import TemplateContabil.Model.Entity.LctoTemplate;
-import TemplateContabil.Template;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,26 +18,29 @@ import java.util.List;
  *
  * @author Administrator
  */
-public class ImportationModel {
+public final class ImportationModel {
 
     private String resultadoComparacao = "";
-    //##################
-    private String nomeBanco;
 
-    protected String filtroFileComparar = "";
-
-    protected banco_Model modelo = null;
+    private final String nomeBanco;
+    private final Integer month;
+    private final Integer year;
 
     /**
-     * Pega lançamentos da configuração
+     * Pega lançamentos da configuração e compara se tiver que comparar. Cria o
+     * template dos lançamentos que pegar conforme a configuração
      *
      * @param nomeBanco Nome do banco que será exibido na comparação
+     * @param month Mês para validação, caso não queira validar deixe nulo
+     * @param year Ano para validação, caso não queira validar deixe nulo
      * @param cfg Configuração para importar o arquivo principal
      * @param cfgComparar Configuração do arquivo para comparar, para não
-     * comparar, deixar em branco
+     * comparar, deixar null
      */
-    public ImportationModel(String nomeBanco, CfgImportacaoLancamentos cfg, CfgImportacaoLancamentos cfgComparar) {
+    public ImportationModel(String nomeBanco, Integer month, Integer year, Importation cfg, Importation cfgComparar) {
         this.nomeBanco = nomeBanco;
+        this.month = month;
+        this.year = year;
 
         List<LctoTemplate> lancamentos = getLctosFromFile(cfg);
         if (cfgComparar != null) {
@@ -51,69 +52,67 @@ public class ImportationModel {
         criarTemplateDosLancamentos(cfg);
     }
 
+    public String getResultadoComparacao() {
+        return resultadoComparacao;
+    }
+
     /**
-     * Cria lista de lançamentos do arquivo informado
+     * Cria lista de lançamentos do arquivo informado e coloca os lançamentos na
+     * lista de lançamentos da configuração passada
      *
-     * @param cfg Configuração para definir como o arquivo será lido, OFX ou
-     * Excel com as colunas definidas
-     * @return Retorna lista de lançamentos do arquivo
+     * @param cfg Configuração da importação, OFX/Excel, arquivo
+     * @return Retorna lista de lançamentos do arquivo da importação
      */
-    private List<LctoTemplate> getLctosFromFile(CfgImportacaoLancamentos cfg) {
+    private List<LctoTemplate> getLctosFromFile(Importation cfg) {
         List<LctoTemplate> lctos = new ArrayList<>();
 
-        if (cfg.getTIPO() == CfgImportacaoLancamentos.TIPO_OFX) {
+        if (cfg.getTIPO() == Importation.TIPO_OFX) {
             lctos = TemplateContabil.Model.Entity.OFX.getListaLctos(cfg.getFile());
-        } else if (cfg.getTIPO() == CfgImportacaoLancamentos.TIPO_EXCEL) {
+        } else if (cfg.getTIPO() == Importation.TIPO_EXCEL) {
             System.out.println("Define modelo de Extratos Excel");
             ExtratoExcel modeloExtratoExcel = new ExtratoExcel(cfg.getFile());
 
             System.out.println("Define lctos no objeto de modelo dos bancos");
-            if (cfg.getExcel_colunaValor().equals("")) {
-                modeloExtratoExcel.setLctos(
-                        cfg.getExcel_colunaData(),
-                        cfg.getExcel_colunaDoc(),
-                        cfg.getExcel_colunaPreTexto(),
-                        cfg.getExcel_colunaComplementoHistorico(),
-                        cfg.getExcel_colunaEntrada(),
-                        cfg.getExcel_colunaSaida(),
-                        cfg.getExcel_colunaValor()
-                );
-            }
+            modeloExtratoExcel.setLctos(
+                    cfg.getExcelCols().get("data"),
+                    cfg.getExcelCols().get("documento"),
+                    cfg.getExcelCols().get("pretexto"),
+                    cfg.getExcelCols().get("historico"),
+                    cfg.getExcelCols().getOrDefault("entrada", ""),
+                    cfg.getExcelCols().getOrDefault("saida", ""),
+                    cfg.getExcelCols().getOrDefault("valor", "")
+            );
 
             lctos = modeloExtratoExcel.getLctos();
         }
 
+        cfg.getLctos().addAll(lctos);
         return lctos;
     }
 
     /**
-     * Criar arquivo Template dos lançamentos na mesma pasta
+     * Criar arquivo Template dos lançamentos na mesma pasta do arquivo dos
+     * lançamentos
      *
-     *
-     * Ai meu parceiro, este é modelo da importacao, e o cfgimportacao vai virar
-     * só importação. A classe importação vai guardar os lançamentos. A classe
-     * importacao vai usar mapa para as colunas. Esse modelo vai receber o mês.
-     * A classe importacao vai guardar o id de configuracao
-     *
-     *
+     * @param cfg Configuração da importação com os lançamentos
      */
-    public void criarTemplateDosLancamentos(CfgImportacaoLancamentos cfg) {
+    public void criarTemplateDosLancamentos(Importation cfg) {
         //Cria arquivo
         String nomeArquivoSalvo = cfg.getNome() + ".xlsm";
 
         File arquivoSalvo = new File(cfg.getFile().getParent() + nomeArquivoSalvo);
 
         Template template = new Template(
-                mes,
-                ano,
+                month,
+                year,
                 arquivoSalvo,
-                idConfig,
-                cfg.getlctos);
+                cfg.getIdTemplateConfig(),
+                cfg.getLctos());
 
         if (template.criarTemplateXlsm()) {
-            throw new Warning("Template do banco " + cfgBanco.getNomeBanco() + " salvo em " + roboView.link(arquivo.getParentFile()));
+            throw new Warning("Template do banco " + nomeBanco + " salvo em " + roboView.link(arquivoSalvo.getParentFile()));
         } else {
-            throw new ErrorIgnore("Erro ao salvar o template do banco '" + cfgBanco.getNomeBanco() + "' na pasta " + roboView.link(arquivo.getParentFile()));
+            throw new ErrorIgnore("Erro ao salvar o template do banco '" + nomeBanco + "' na pasta " + roboView.link(arquivoSalvo.getParentFile()));
         }
     }
 }

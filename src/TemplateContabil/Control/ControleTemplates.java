@@ -1,124 +1,119 @@
 package TemplateContabil.Control;
 
-import TemplateContabil.Model.Entity.LctoTemplate;
 import Entity.Executavel;
-import Entity.Warning;
-import LctoTemplate.CfgBancoTemplate;
 import Robo.View.roboView;
-import TemplateContabil.ComparacaoTemplates;
-import TemplateContabil.Model.Entity.CfgImportacaoLancamentos;
-import TemplateContabil.Model.ExtratoExcel;
-import TemplateContabil.Model.banco_Model;
+import TemplateContabil.Model.Entity.Importation;
+import TemplateContabil.Model.ImportationModel;
 import fileManager.Selector;
-import fileManager.StringFilter;
-
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ControleTemplates {
 
-    protected int mes;
-    protected int ano;
-    protected int empresa;
-    protected String pathNameEmpresa;
-    protected String pathEscrituracaoMensal;
-    protected String pastaAnualNome;
-    protected String pathPrincipalArquivos;
-    protected File fileMainFolder;
+    private Integer mes;
+    private Integer ano;
 
-    protected String pastaAnualPadraoNome = "Extratos";
-
-    protected StringFilter filtroTemplatePadrao = new StringFilter("Template;Extratos;.xlsm");
-    private final String pastaMensalNome;
+    protected File pastaPrincipal;
+    protected File pastaEscMensal;
 
     /**
-     * Define um controle com a pasta indicada.\n Após a construção da classe
-     * deverá ser chamada a função "setDefaultPaths" que irá construir as pastas
-     * necessárias.\n Antes de chamar a função você também pode configurar as
-     * pastas.\n Depois será necessário chamar a classe executavel
-     * "definirFileTemplatePadrao" antes de chamar a classe executavel dos
-     * bancos
+     * Define um controle de templates.Para que tudo funcione bem você deve
+     * definir a pasta da Esc. Mensal da empresa, e depois a pasta principal.
+     * Caso a pasta seja diferente da convencional você pode somente definir a
+     * pasta principal com o File bruto da pasta que possui o arquivo.
      *
-     * @param mes Mês das pastas
-     * @param ano Ano das pastas
-     * @param pastaAnual Por exemplo: Caso coloque "Extratos;Contas a Pagar" a
-     * pasta acessada será "Esc Mensal/ano/Extratos/mes.ano/Contas a Pagar
-     * @param empresa Codigo da empresa
-     * @param pathNameEmpresa A pasta da empresa em G:/Contabil/Clientes
+     * Caso a pasta não seja convencional de mes e você não queria validar os
+     * lançamentos do mes e ano, deixe null o mes e ano
+     *
+     * @param mes Mes das pastas e mes de validação do arquivo
+     * @param ano Ano das pastas e mes de validação do arquivo
      */
-    public ControleTemplates(int mes, int ano, int empresa, String pathNameEmpresa, String pastaAnual, String pastaMensal) {
+    public ControleTemplates(Integer mes, Integer ano) {
         this.mes = mes;
         this.ano = ano;
-        this.empresa = empresa;
-        this.pathNameEmpresa = pathNameEmpresa;
-        this.pastaAnualNome = pastaAnual.equals("") ? pastaAnualPadraoNome : pastaAnual;
-        this.pastaMensalNome = pastaMensal.equals("") ? "" : "\\" + pastaMensal;
-
-        //Define pastas do mês em string
-        pathEscrituracaoMensal = "\\\\HEIMERDINGER\\DOCS\\Contábil\\Clientes\\" + pathNameEmpresa + "\\Escrituração mensal";
-        pathPrincipalArquivos = pathEscrituracaoMensal + "\\#ano#\\" + pastaAnualNome + "\\#mes#.#ano#" + pastaMensalNome;
-        replaceMonthAndYearOnMainFolder();
     }
 
     /**
-     * Caso a pasta principal seja diferente da convencional
-     * "PastaEmpresa\ano\PastaAnual(Extratos)\mes.ano\arquivos mensais", você
-     * pode definir outro com esta função, se usar "#ano#" e "#mes#" na string,
-     * irá fazer replace com o mes e ano indicados
+     * Define a pasta que será utilizada
+     *
+     * @param pastaAnual Pasta Anual, por exemplo: Caso coloque "Extratos" a
+     * pasta acessada será "Esc Mensal/ano/Extratos/mes.ano/"
+     * @param pastaMensal Pasta Mensal que aparece depois do mes e ano, por
+     * exemplo "Banco 5899" acessará a pasta "Esc Mensal/ ano/ Extratos/
+     * mes.ano/ Banco 5899". Para não utilizar deixe em branco
      */
-    public void setPathPrincipalArquivos(String pathPrincipalArquivos) {
-        this.pathPrincipalArquivos = pathPrincipalArquivos;
-        replaceMonthAndYearOnMainFolder();
+    public void setPasta(String pastaAnual, String pastaMensal) {
+        //Coloca barra antes da pasta mensal caso exista 
+        pastaMensal = pastaMensal.equals("") ? "" : "\\" + pastaMensal;
+
+        String path = pastaEscMensal.getAbsolutePath() + "\\#ano#\\" + pastaAnual + "\\#mes#.#ano#" + pastaMensal;
+
+        //Substitui #mes# pelo mês informado
+        path = path.replaceAll("#mes#", "" + ((this.mes < 10 ? "0" : "") + this.mes));
+        //Substitui #ano# pelo ano informado
+        path = path.replaceAll("#ano#", "" + this.ano);
+
+        //Cria variavel file da pasta principal com a string, utiliza getAbsoluteFile por algum motivo que nao sei, deixei ai
+        pastaPrincipal = new File(path).getAbsoluteFile();
     }
 
     /**
-     * Dá replace no path em String da pasta principal nos #ano# e #mes# e
-     * reseta um file da pasta principal
+     * Define a pasta que será utilizada
+     *
+     * @param folder File do folder principal
      */
-    private void replaceMonthAndYearOnMainFolder() {
-        //Dá replace dos #ano e #mes na pasta principal em string
-        pathPrincipalArquivos = pathPrincipalArquivos.replaceAll("#mes#", "" + ((this.mes < 10 ? "0" : "") + this.mes));
-        pathPrincipalArquivos = pathPrincipalArquivos.replaceAll("#ano#", "" + this.ano);
-        //Cria variavel file da pasta principal com a string
-        fileMainFolder = new File(pathPrincipalArquivos).getAbsoluteFile();
+    public void setPasta(File folder) {
+        pastaPrincipal = folder;
     }
 
+    /**
+     * Define a pasta de escrituração mensal com o nome da pasta da empresa
+     *
+     * @param nomePastaEmpresa O nome da pasta da empresa em
+     * G:/Contabil/Clientes
+     */
+    public void setPastaEscMensal(String nomePastaEmpresa) {
+        pastaEscMensal = new File("\\\\HEIMERDINGER\\DOCS\\Contábil\\Clientes\\" + nomePastaEmpresa + "\\Escrituração mensal");
+    }
 
-    public class importacaoPadraoBancoOfx extends importacaoPadraoBanco {
+    /**
+     * Classe executavel que define na importacao passada o arquivo conforme o
+     * filtro se existir, se nao encontrar mostra erro
+     */
+    public class defineArquivoNaImportacao extends Executavel {
 
-        public importacaoPadraoBancoOfx(String nomeBanco, String filtroArquivo, int nroBanco) {
-            super(nomeBanco, filtroArquivo + ";.ofx", nroBanco);
+        private final String filtroArquivo;
+        private final Importation importation;
+
+        public defineArquivoNaImportacao(String filtroArquivo, Importation importation) {
+            this.filtroArquivo = filtroArquivo;
+            this.importation = importation;
+        }
+
+        @Override
+        public void run() {
+            File file = Selector.getFileOnFolder(pastaPrincipal, filtroArquivo, "");
+            
+            //Se encontrar o arquivo
+            if(file != null){
+                importation.setFile(file);
+            }else{
+                throw new Error("Não foi encontrado o arquivo '" + filtroArquivo + "' na pasta " + roboView.link(pastaPrincipal) );
+            }
         }
     }
 
-    public class importacaoBancoExtratoExcel extends importacaoPadraoBanco {
+    public class converterArquivoParaTemplate extends Executavel {
 
-        public importacaoBancoExtratoExcel(String nomeBanco, String filtroArquivo, int nroBanco, String colunaData, String colunaDoc, String colunaPreTexto, String colunaComplementoHistorico, String colunaEntrada, String colunaSaida) {
-            super(nomeBanco, filtroArquivo, nroBanco);
+        private final Importation importation;
 
-            cfgTipoLctos = new CfgImportacaoLancamentos();
-            cfgTipoLctos.setTIPO(CfgImportacaoLancamentos.TIPO_EXCEL);
-
-            cfgTipoLctos.setExcel_colunaData(colunaData);
-            cfgTipoLctos.setExcel_colunaDoc(colunaDoc);
-            cfgTipoLctos.setExcel_colunaPreTexto(colunaPreTexto);
-            cfgTipoLctos.setExcel_colunaComplementoHistorico(colunaComplementoHistorico);
-            cfgTipoLctos.setExcel_colunaEntrada(colunaEntrada);
-            cfgTipoLctos.setExcel_colunaSaida(colunaSaida);
+        public converterArquivoParaTemplate(Importation importation) {
+            this.importation = importation;
         }
 
-        public importacaoBancoExtratoExcel(String nomeBanco, String filtroArquivo, int nroBanco, String colunaData, String colunaDoc, String colunaPreTexto, String colunaComplementoHistorico, String colunaValor) {
-            super(nomeBanco, filtroArquivo, nroBanco);
-
-            cfgTipoLctos = new CfgImportacaoLancamentos();
-            cfgTipoLctos.setTIPO(CfgImportacaoLancamentos.TIPO_EXCEL);
-
-            cfgTipoLctos.setExcel_colunaData(colunaData);
-            cfgTipoLctos.setExcel_colunaDoc(colunaDoc);
-            cfgTipoLctos.setExcel_colunaPreTexto(colunaPreTexto);
-            cfgTipoLctos.setExcel_colunaComplementoHistorico(colunaComplementoHistorico);
-            cfgTipoLctos.setExcel_colunaValor(colunaValor);
+        @Override
+        public void run() {
+            //Chama o modelo da importação que irá criar o template e gerar warning se algo der errado
+            ImportationModel modelo = new ImportationModel(importation.getNome(), mes, ano, importation, null);
         }
     }
 }
