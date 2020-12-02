@@ -27,8 +27,9 @@ public final class ImportationModel {
     private final Integer year;
 
     /**
-     * Pega lançamentos da configuração e compara se tiver que comparar. Cria o
-     * template dos lançamentos que pegar conforme a configuração
+     * Pega lançamentos da configuração e compara se tiver que comparar. Depois
+     * tem que chamar a função para criar o template dos lançamentos que pegar
+     * conforme a configuração.
      *
      * @param nomeBanco Nome do banco que será exibido na comparação
      * @param month Mês para validação, caso não queira validar deixe nulo
@@ -46,10 +47,7 @@ public final class ImportationModel {
         if (cfgComparar != null) {
             List<LctoTemplate> comparar = getLctosFromFile(cfgComparar);
             resultadoComparacao = ComparacaoTemplates.getComparacaoString(this.nomeBanco, cfgComparar.getFile().getName(), lancamentos, comparar);
-        }
-
-        //Cria template só do principal
-        criarTemplateDosLancamentos(cfg);
+        }        
     }
 
     public String getResultadoComparacao() {

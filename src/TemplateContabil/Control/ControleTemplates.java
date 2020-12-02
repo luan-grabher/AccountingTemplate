@@ -114,6 +114,7 @@ public class ControleTemplates {
         public void run() {
             //Chama o modelo da importação que irá criar o template e gerar warning se algo der errado
             ImportationModel modelo = new ImportationModel(importation.getNome(), mes, ano, importation, null);
+            modelo.criarTemplateDosLancamentos(importation);
         }
     }
 }
