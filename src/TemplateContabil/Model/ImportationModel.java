@@ -98,7 +98,7 @@ public final class ImportationModel {
         //Cria arquivo
         String nomeArquivoSalvo = cfg.getNome() + ".xlsm";
 
-        File arquivoSalvo = new File(cfg.getFile().getParent() + nomeArquivoSalvo);
+        File arquivoSalvo = new File(cfg.getFile().getParent() + "\\" + nomeArquivoSalvo);
 
         Template template = new Template(
                 month,
