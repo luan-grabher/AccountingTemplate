@@ -177,7 +177,7 @@ public class ExtratoExcel {
     private BigDecimal getBigDecimalFromCell(Cell cell, boolean forceNegative) {
         //Pega texto das celulas
         String valueString = cell != null ? JExcel.getStringCell(cell) : "0.00";
-        valueString = valueString.replaceAll("[^0-9\\.,]", "");
+        valueString = valueString.replaceAll("[^0-9\\.,-]", "");
 
         //Se tiver . antes da virgula remove os pontos e coloca ponto no lugar da virgula
         if (valueString.indexOf(".") < valueString.indexOf(",")) {
