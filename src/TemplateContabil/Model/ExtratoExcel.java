@@ -72,108 +72,114 @@ public class ExtratoExcel {
      * -)
      */
     private void setLctosFromSheet(String colunaData, String colunaDoc, String colunaPreTexto, String colunasHistorico, String colunaEntrada, String colunaSaida, String colunaValor) {
-        //Separa as colunas de historico
-        String[] colunasComplemento = colunasHistorico.split(";");
+        if (colunaData != null && !colunaData.isBlank()
+                && colunasHistorico != null && !colunasHistorico.isBlank()) {
+            //Separa as colunas de historico
+            String[] colunasComplemento = colunasHistorico.split(";");
 
-        for (Row row : sheet) {
-            try {
-                Cell celData = row.getCell(JExcel.Cell(colunaData));
-                //Se a celula da data existir
-                if (celData != null) {
-                    String celDateValueString = JExcel.getStringCell(celData);
-                    Valor data = new Valor(celDateValueString);
-                    if (data.éUmaDataValida() || (!celDateValueString.equals("") && JExcel.isDateCell(celData))) {
-                        //Converte Data
-                        if (!data.éUmaDataValida()) {
-                            data.setString(JExcel.getStringDate(Integer.valueOf(data.getNumbersList().get(0))));
-                        }
-
-                        String doc = "";
-                        String preTexto = "";
-                        String complemento = "";
-                        BigDecimal value;
-
-                        //Define o documento se tiver
-                        if (!colunaDoc.equals("")) {
-                            doc = JExcel.getStringCell(row.getCell(JExcel.Cell(colunaDoc)));
-                        }
-
-                        //Define o pretexto se tiver
-                        if (!colunaPreTexto.equals("")) {
-                            if (colunaPreTexto.contains("#")) {
-                                preTexto = colunaPreTexto.replaceAll("#", "");
-                            } else {
-                                Cell cell = row.getCell(JExcel.Cell(colunaPreTexto));
-                                if (cell != null) {
-                                    preTexto = JExcel.getStringCell(cell);
-                                }
+            for (Row row : sheet) {
+                try {
+                    Cell celData = row.getCell(JExcel.Cell(colunaData));
+                    //Se a celula da data existir
+                    if (celData != null) {
+                        String celDateValueString = JExcel.getStringCell(celData);
+                        Valor data = new Valor(celDateValueString);
+                        if (data.éUmaDataValida() || (!celDateValueString.equals("") && JExcel.isDateCell(celData))) {
+                            //Converte Data
+                            if (!data.éUmaDataValida()) {
+                                data.setString(JExcel.getStringDate(Integer.valueOf(data.getNumbersList().get(0))));
                             }
-                        }
 
-                        //Define o completemento se tiver
-                        if (!colunasComplemento.equals("")) {
-                            StringBuilder sbComplemento = new StringBuilder();
-                            for (String colunaComplemento : colunasComplemento) {
-                                if (!colunaComplemento.equals("")) {
-                                    if (!sbComplemento.toString().equals("")) {
-                                        sbComplemento.append(" - ");
-                                    }
+                            String doc = "";
+                            String preTexto = "";
+                            String complemento = "";
+                            BigDecimal value = new BigDecimal("0.00");
 
-                                    Cell cell = row.getCell(JExcel.Cell(colunaComplemento));
+                            //Define o documento se tiver
+                            if (colunaDoc != null && !colunaDoc.equals("")) {
+                                doc = JExcel.getStringCell(row.getCell(JExcel.Cell(colunaDoc)));
+                            }
 
+                            //Define o pretexto se tiver
+                            if (colunaPreTexto != null && !colunaPreTexto.equals("")) {
+                                if (colunaPreTexto.contains("#")) {
+                                    preTexto = colunaPreTexto.replaceAll("#", "");
+                                } else {
+                                    Cell cell = row.getCell(JExcel.Cell(colunaPreTexto));
                                     if (cell != null) {
-                                        String celComplementoString = JExcel.getStringCell(cell);
-                                        sbComplemento.append(celComplementoString);
+                                        preTexto = JExcel.getStringCell(cell);
                                     }
                                 }
                             }
 
-                            complemento = sbComplemento.toString();
-                        }
+                            //Define o completemento se tiver
+                            if (!colunasComplemento.equals("")) {
+                                StringBuilder sbComplemento = new StringBuilder();
+                                for (String colunaComplemento : colunasComplemento) {
+                                    if (!colunaComplemento.equals("")) {
+                                        if (!sbComplemento.toString().equals("")) {
+                                            sbComplemento.append(" - ");
+                                        }
 
-                        if (colunaValor.equals("")) {
-                            //Pega celulas
-                            Cell entryCell = row.getCell(JExcel.Cell(colunaEntrada));
-                            Cell exitCell = row.getCell(JExcel.Cell(colunaSaida.replaceAll("-", "")));
+                                        Cell cell = row.getCell(JExcel.Cell(colunaComplemento));
 
-                            //Pega texto das celulas
-                            String entryString = entryCell != null ? JExcel.getStringCell(entryCell) : "0";
-                            String exitString = exitCell != null ? JExcel.getStringCell(exitCell) : "0";
+                                        if (cell != null) {
+                                            String celComplementoString = JExcel.getStringCell(cell);
+                                            sbComplemento.append(celComplementoString);
+                                        }
+                                    }
+                                }
 
-                            //Remove pontos
-                            entryString = entryString.replaceAll("\\.", "").replaceAll("\\,", ".");
-                            exitString = exitString.replaceAll("\\.", "").replaceAll("\\,", ".");
-
-                            //Tenta criar a variável de valor
-                            BigDecimal entryBD = new BigDecimal(entryString.equals("") ? "0" : entryString);
-                            BigDecimal exitBD = new BigDecimal(exitString.equals("") ? "0" : exitString);
-
-                            //Se a coluna tiver que multiplicar por -1 e o valor encontrado for maior que zero
-                            if (colunaSaida.contains("-") && exitBD.compareTo(BigDecimal.ZERO) > 0) {
-                                exitBD = exitBD.multiply(new BigDecimal("-1"));
+                                complemento = sbComplemento.toString();
                             }
 
-                            value = entryBD.compareTo(BigDecimal.ZERO) == 0 ? exitBD : entryBD;
-                        } else {
-                            //Pega celula
-                            Cell cell = row.getCell(JExcel.Cell(colunaValor.replaceAll("-", "")));
+                            if (colunaValor.equals("")) {
+                                //Pega celulas
+                                Cell entryCell = row.getCell(JExcel.Cell(colunaEntrada));
+                                Cell exitCell = row.getCell(JExcel.Cell(colunaSaida.replaceAll("-", "")));
 
-                            //Pega valor texto
-                            String string = cell != null ? JExcel.getStringCell(cell) : "0";
+                                //Pega texto das celulas
+                                String entryString = entryCell != null ? JExcel.getStringCell(entryCell) : "0";
+                                String exitString = exitCell != null ? JExcel.getStringCell(exitCell) : "0";
 
-                            value = new BigDecimal(string);
+                                //Remove pontos
+                                entryString = entryString.replaceAll("\\.", "").replaceAll("\\,", ".");
+                                exitString = exitString.replaceAll("\\.", "").replaceAll("\\,", ".");
 
-                            if (colunaValor.contains("-")) {
-                                value = value.multiply(new BigDecimal("-1"));
+                                //Tenta criar a variável de valor
+                                BigDecimal entryBD = new BigDecimal(entryString.equals("") ? "0" : entryString);
+                                BigDecimal exitBD = new BigDecimal(exitString.equals("") ? "0" : exitString);
+
+                                //Se a coluna tiver que multiplicar por -1 e o valor encontrado for maior que zero
+                                if (colunaSaida.contains("-") && exitBD.compareTo(BigDecimal.ZERO) > 0) {
+                                    exitBD = exitBD.multiply(new BigDecimal("-1"));
+                                }
+
+                                value = entryBD.compareTo(BigDecimal.ZERO) == 0 ? exitBD : entryBD;
+                            } else {
+                                //Pega celula
+                                Cell cell = row.getCell(JExcel.Cell(colunaValor.replaceAll("-", "")));
+
+                                //Pega valor texto
+                                String string = cell != null ? JExcel.getStringCell(cell) : "0";
+
+                                value = new BigDecimal(string);
+
+                                if (colunaValor.contains("-")) {
+                                    value = value.multiply(new BigDecimal("-1"));
+                                }
                             }
-                        }
 
-                        lctos.add(new LctoTemplate(data.getString(), doc, preTexto, complemento, new Valor(value)));
+                            lctos.add(new LctoTemplate(data.getString(), doc, preTexto, complemento, new Valor(value)));
+                        }
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
+
+        } else {
+            throw new Error("A coluna de extração da data e historico não podem ficar em branco!");
         }
     }
 
