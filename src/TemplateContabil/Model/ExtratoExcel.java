@@ -67,7 +67,8 @@ public class ExtratoExcel {
      * @param colunasHistorico Coloque as colunas que compoem o historico
      * separados por ";" na ordem em que aparecem
      * @param colunaEntrada coluna com valores de entrada
-     * @param colunaSaida coluna com valores de saida
+     * @param colunaSaida coluna com valores de saida, tem que colocar "-" na
+     * frente caso no excel os valores apareçam positivos
      * @param colunaValor Coluna que possui valores de entrada e saida(com sinal
      * -)
      */
@@ -93,7 +94,7 @@ public class ExtratoExcel {
                             String doc = "";
                             String preTexto = "";
                             String complemento = "";
-                            BigDecimal value = new BigDecimal("0.00");
+                            BigDecimal value;
 
                             //Define o documento se tiver
                             if (colunaDoc != null && !colunaDoc.equals("")) {
@@ -113,7 +114,7 @@ public class ExtratoExcel {
                             }
 
                             //Define o completemento se tiver
-                            if (!colunasComplemento.equals("")) {
+                            if (colunasComplemento.length > 0) {
                                 StringBuilder sbComplemento = new StringBuilder();
                                 for (String colunaComplemento : colunasComplemento) {
                                     if (!colunaComplemento.equals("")) {
@@ -133,44 +134,27 @@ public class ExtratoExcel {
                                 complemento = sbComplemento.toString();
                             }
 
-                            if (colunaValor.equals("")) {
+                            if (colunaValor == null || colunaValor.equals("")) {
                                 //Pega celulas
                                 Cell entryCell = row.getCell(JExcel.Cell(colunaEntrada));
                                 Cell exitCell = row.getCell(JExcel.Cell(colunaSaida.replaceAll("-", "")));
 
-                                //Pega texto das celulas
-                                String entryString = entryCell != null ? JExcel.getStringCell(entryCell) : "0";
-                                String exitString = exitCell != null ? JExcel.getStringCell(exitCell) : "0";
-
-                                //Remove pontos
-                                entryString = entryString.replaceAll("\\.", "").replaceAll("\\,", ".");
-                                exitString = exitString.replaceAll("\\.", "").replaceAll("\\,", ".");
-
-                                //Tenta criar a variável de valor
-                                BigDecimal entryBD = new BigDecimal(entryString.equals("") ? "0" : entryString);
-                                BigDecimal exitBD = new BigDecimal(exitString.equals("") ? "0" : exitString);
-
-                                //Se a coluna tiver que multiplicar por -1 e o valor encontrado for maior que zero
-                                if (colunaSaida.contains("-") && exitBD.compareTo(BigDecimal.ZERO) > 0) {
-                                    exitBD = exitBD.multiply(new BigDecimal("-1"));
-                                }
+                                //Cria variavel de valores
+                                BigDecimal entryBD = getBigDecimalFromCell(entryCell, false);
+                                BigDecimal exitBD = getBigDecimalFromCell(exitCell, colunaSaida.contains("-"));
 
                                 value = entryBD.compareTo(BigDecimal.ZERO) == 0 ? exitBD : entryBD;
                             } else {
                                 //Pega celula
                                 Cell cell = row.getCell(JExcel.Cell(colunaValor.replaceAll("-", "")));
 
-                                //Pega valor texto
-                                String string = cell != null ? JExcel.getStringCell(cell) : "0";
-
-                                value = new BigDecimal(string);
-
-                                if (colunaValor.contains("-")) {
-                                    value = value.multiply(new BigDecimal("-1"));
-                                }
+                                value = getBigDecimalFromCell(cell, colunaValor.contains("-"));
                             }
 
-                            lctos.add(new LctoTemplate(data.getString(), doc, preTexto, complemento, new Valor(value)));
+                            //Se valor for diferente de zero
+                            if (value.compareTo(BigDecimal.ZERO) != 0) {
+                                lctos.add(new LctoTemplate(data.getString(), doc, preTexto, complemento, new Valor(value)));
+                            }
                         }
                     }
                 } catch (Exception e) {
@@ -181,6 +165,33 @@ public class ExtratoExcel {
         } else {
             throw new Error("A coluna de extração da data e historico não podem ficar em branco!");
         }
+    }
+
+    /**
+     * Pega bigdecimal de uma celula do excel numerica
+     * 
+     * @param cell CElula que ira pegar numero
+     * @param forceNegative Se deve multiplicar por -1 o numero se for positivo
+     * @return celula em número BigDecimal
+     */
+    private BigDecimal getBigDecimalFromCell(Cell cell, boolean forceNegative) {
+        //Pega texto das celulas
+        String valueString = cell != null ? JExcel.getStringCell(cell) : "0.00";
+        valueString = valueString.replaceAll("[^0-9\\.,]", "");
+
+        //Se tiver . antes da virgula remove os pontos e coloca ponto no lugar da virgula
+        if (valueString.indexOf(".") < valueString.indexOf(",")) {
+            valueString = valueString.replaceAll("\\.", "").replaceAll("\\,", ".");
+        }
+
+        BigDecimal valueBigDecimal = new BigDecimal(valueString.equals("") ? "0" : valueString);
+
+        //Se a coluna tiver que multiplicar por -1 e o valor encontrado for maior que zero
+        if (forceNegative && valueBigDecimal.compareTo(BigDecimal.ZERO) > 0) {
+            valueBigDecimal = valueBigDecimal.multiply(new BigDecimal("-1"));
+        }
+        
+        return valueBigDecimal;
     }
 
 }
