@@ -1,6 +1,7 @@
 package TemplateContabil.Model.Entity;
 
 import Auxiliar.Valor;
+import java.text.Normalizer;
 
 public class LctoTemplate {
 
@@ -76,8 +77,12 @@ public class LctoTemplate {
         String historico = documento.equals("") ? "" : documento + " - ";
         historico += prefixoHistorico.equals("") ? "" : prefixoHistorico + " ";
         historico += complementoHistorico;
+        historico = removerAcentos(historico);
         historico = historico.replaceAll("[^a-zA-Z0-9-./ ]", " ");
         return historico;
     }
 
+    public static String removerAcentos(String str) {
+        return Normalizer.normalize(str, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+    }
 }
