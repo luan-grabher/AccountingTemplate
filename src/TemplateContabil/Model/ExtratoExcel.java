@@ -86,7 +86,7 @@ public class ExtratoExcel {
                         String celDateValueString = JExcel.getStringCell(celData);
                         Valor data = new Valor(celDateValueString);
                         if (data.éUmaDataValida() || (!celDateValueString.equals("") && JExcel.isDateCell(celData))) {
-                            //Converte Data
+                            //Converte Data se for data excel
                             if (!data.éUmaDataValida()) {
                                 data.setString(JExcel.getStringDate(Integer.valueOf(data.getNumbersList().get(0))));
                             }

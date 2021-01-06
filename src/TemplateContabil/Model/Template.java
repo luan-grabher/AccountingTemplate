@@ -111,10 +111,12 @@ public class Template {
             String mesMMBarra = "/" + (mes < 10 ? "0" : "") + mes + "/";
 
             String anoBarra = "/" + ano;
+            
+            String anoBarraYY = "/" + Integer.toString(ano).substring(2);
 
             if (!date.contains(mesBarra) && !date.contains(mesMMBarra)) {
                 return false;
-            } else if (!date.endsWith(anoBarra)) {
+            } else if (!date.endsWith(anoBarra) && !date.contains(anoBarraYY)) {
                 return false;
             }
 
