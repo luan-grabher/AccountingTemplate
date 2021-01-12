@@ -98,7 +98,7 @@ public class ControleTemplates {
             //Se encontrar o arquivo
             if(file != null){
                 //Verifica se é PDF para converter
-                if(file.getAbsolutePath().endsWith(".pdf")){
+                if(file.getAbsolutePath().toLowerCase().endsWith(".pdf")){
                     //Converte em XLSX
                     file = convertPdfToExcel(file);
                 }
