@@ -120,7 +120,7 @@ public class ControleTemplates {
         options.setMinimizeTheNumberOfWorksheets(true);
         
         //Setr new file xlsx
-        File newFile = new File(pdfFile.getAbsolutePath().replaceAll(".pdf", ".xlsx"));
+        File newFile = new File(pdfFile.getAbsolutePath().replaceAll(".PDF",".pdf").replaceAll(".pdf", ".xlsx"));
         
         // Convert PDF to XLSX
         doc.save(newFile.getAbsolutePath(), options);
