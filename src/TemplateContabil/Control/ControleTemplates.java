@@ -4,6 +4,8 @@ import Entity.Executavel;
 import Robo.View.roboView;
 import TemplateContabil.Model.Entity.Importation;
 import TemplateContabil.Model.ImportationModel;
+import com.aspose.pdf.Document;
+import com.aspose.pdf.ExcelSaveOptions;
 import fileManager.Selector;
 import java.io.File;
 
@@ -95,11 +97,35 @@ public class ControleTemplates {
             
             //Se encontrar o arquivo
             if(file != null){
+                //Verifica se é PDF para converter
+                if(file.getAbsolutePath().endsWith(".pdf")){
+                    //Converte em XLSX
+                    file = convertPdfToExcel(file);
+                }
+                
                 importation.setFile(file);
             }else{
                 throw new Error("Não foi encontrado o arquivo '" + filtroArquivo + "' na pasta " + roboView.link(pastaPrincipal) );
             }
         }
+    }
+    
+    public File convertPdfToExcel(File pdfFile){
+        Document doc =  new Document(pdfFile.getAbsolutePath());
+        // Set Excel options
+        ExcelSaveOptions options = new ExcelSaveOptions();
+        // Set output format
+        options.setFormat(ExcelSaveOptions.ExcelFormat.XLSX);
+        // Set minimizing option
+        options.setMinimizeTheNumberOfWorksheets(true);
+        
+        //Setr new file xlsx
+        File newFile = new File(pdfFile.getAbsolutePath().replaceAll(".pdf", ".xlsx"));
+        
+        // Convert PDF to XLSX
+        doc.save(newFile.getAbsolutePath(), options);
+        
+        return newFile;
     }
 
     public class converterArquivoParaTemplate extends Executavel {
