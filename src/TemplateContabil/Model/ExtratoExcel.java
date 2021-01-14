@@ -144,7 +144,9 @@ public class ExtratoExcel {
                                                     if (!sbComplemento.toString().equals("")) {
                                                         sbComplemento.append(" - ");
                                                     }
-                                                    sbComplemento.append(prefixo).append("- ");
+                                                    if(!prefixo.equals("")){
+                                                        sbComplemento.append(prefixo).append("- ");
+                                                    }
 
                                                     //Adiciona a string da celula
                                                     sbComplemento.append(cellString.trim());
