@@ -65,7 +65,10 @@ public class ExtratoExcel {
      * @param colunaPreTexto Para definir um pretexto bruto ao invés de uma
      * coluna coloque "#" na frente
      * @param colunasHistorico Coloque as colunas que compoem o historico
-     * separados por ";" na ordem em que aparecem
+     * separados por ";" na ordem em que aparecem. Para configuração avançada do
+     * historico separe 3 vetorescom '#', no primeiro vetor coloque a coluna do
+     * excel, na segunda o prefixo (pode ficar em branco), na terceira o filtro
+     * regex. o prefixo e filtro regex podem ficar em branco
      * @param colunaEntrada coluna com valores de entrada
      * @param colunaSaida coluna com valores de saida, tem que colocar "-" na
      * frente caso no excel os valores apareçam positivos
@@ -115,18 +118,38 @@ public class ExtratoExcel {
 
                             //Define o completemento se tiver
                             if (colunasComplemento.length > 0) {
+                                //Cria String Builder para fazer o Complemento
                                 StringBuilder sbComplemento = new StringBuilder();
+                                //Percorre todas colunas que tem
                                 for (String colunaComplemento : colunasComplemento) {
+                                    //Se existir uma coluna para verificar
                                     if (!colunaComplemento.equals("")) {
-                                        if (!sbComplemento.toString().equals("")) {
-                                            sbComplemento.append(" - ");
-                                        }
+                                        //Divide para pegar o prefixo
+                                        String[] colunaSplit = colunaComplemento.split("#");
+                                        if (colunaSplit.length > 0) {
+                                            String coluna = colunaSplit[0];
+                                            String prefixo = colunaSplit.length > 1 ? colunaSplit[1] : "";
+                                            String regex = colunaSplit.length > 2 ? colunaSplit[2] : "";
 
-                                        Cell cell = row.getCell(JExcel.Cell(colunaComplemento));
+                                            //Pega celula da coluna
+                                            Cell cell = row.getCell(JExcel.Cell(coluna));
 
-                                        if (cell != null) {
-                                            String celComplementoString = JExcel.getStringCell(cell);
-                                            sbComplemento.append(celComplementoString);
+                                            //Se a celula nao for nula
+                                            if (cell != null) {
+                                                //Pega String da celula
+                                                String cellString = JExcel.getStringCell(cell);
+                                                //Se nao estiver em branco e o regex estiver em branco ou a string bater com o regex
+                                                if (!cellString.equals("") && ("".equals(regex) || cellString.matches(regex))) {
+                                                    //Se o stringbuilder nao estiver vazio coloca - para separar
+                                                    if (!sbComplemento.toString().equals("")) {
+                                                        sbComplemento.append(" - ");
+                                                    }
+                                                    sbComplemento.append(prefixo).append("- ");
+
+                                                    //Adiciona a string da celula
+                                                    sbComplemento.append(cellString.trim());
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -169,7 +192,7 @@ public class ExtratoExcel {
 
     /**
      * Pega bigdecimal de uma celula do excel numerica
-     * 
+     *
      * @param cell CElula que ira pegar numero
      * @param forceNegative Se deve multiplicar por -1 o numero se for positivo
      * @return celula em número BigDecimal
@@ -190,7 +213,7 @@ public class ExtratoExcel {
         if (forceNegative && valueBigDecimal.compareTo(BigDecimal.ZERO) > 0) {
             valueBigDecimal = valueBigDecimal.multiply(new BigDecimal("-1"));
         }
-        
+
         return valueBigDecimal;
     }
 
