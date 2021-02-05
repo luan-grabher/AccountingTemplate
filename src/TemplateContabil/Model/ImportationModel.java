@@ -5,14 +5,18 @@
  */
 package TemplateContabil.Model;
 
+import Auxiliar.Valor;
 import Entity.ErrorIgnore;
 import Entity.Warning;
 import Robo.View.roboView;
 import TemplateContabil.Model.Entity.Importation;
 import TemplateContabil.Model.Entity.LctoTemplate;
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -47,7 +51,7 @@ public final class ImportationModel {
         if (cfgComparar != null) {
             List<LctoTemplate> comparar = getLctosFromFile(cfgComparar);
             resultadoComparacao = ComparacaoTemplates.getComparacaoString(this.nomeBanco, cfgComparar.getFile().getName(), lancamentos, comparar);
-        }        
+        }
     }
 
     public String getResultadoComparacao() {
@@ -67,21 +71,49 @@ public final class ImportationModel {
         if (cfg.getTIPO() == Importation.TIPO_OFX) {
             lctos = TemplateContabil.Model.Entity.OFX.getListaLctos(cfg.getFile());
         } else if (cfg.getTIPO() == Importation.TIPO_EXCEL) {
-            System.out.println("Define modelo de Extratos Excel");
-            ExtratoExcel modeloExtratoExcel = new ExtratoExcel(cfg.getFile());
+            //Se não for do novo modelo
+            if (cfg.getXlsxCols().isEmpty()) {
+                System.out.println("Define modelo de Extratos Excel");
+                ExtratoExcel modeloExtratoExcel = new ExtratoExcel(cfg.getFile());
 
-            System.out.println("Define lctos no objeto de modelo dos bancos");
-            modeloExtratoExcel.setLctos(
-                    cfg.getExcelCols().get("data"),
-                    cfg.getExcelCols().get("documento"),
-                    cfg.getExcelCols().get("pretexto"),
-                    cfg.getExcelCols().get("historico"),
-                    cfg.getExcelCols().getOrDefault("entrada", ""),
-                    cfg.getExcelCols().getOrDefault("saida", ""),
-                    cfg.getExcelCols().getOrDefault("valor", "")
-            );
+                System.out.println("Define lctos no objeto de modelo dos bancos");
+                modeloExtratoExcel.setLctos(
+                        cfg.getExcelCols().get("data"),
+                        cfg.getExcelCols().get("documento"),
+                        cfg.getExcelCols().get("pretexto"),
+                        cfg.getExcelCols().get("historico"),
+                        cfg.getExcelCols().getOrDefault("entrada", ""),
+                        cfg.getExcelCols().getOrDefault("saida", ""),
+                        cfg.getExcelCols().getOrDefault("valor", "")
+                );
 
-            lctos = modeloExtratoExcel.getLctos();
+                lctos = modeloExtratoExcel.getLctos();
+            } else {
+                //Pega Lctos
+                List<Map<String, Object>> rows = JExcel.XLSX.get(cfg.getFile(), cfg.getXlsxCols());
+
+                //Transforma em Lctos
+                rows.forEach((row) -> {
+                    //Define o valor
+                    Valor valor = new Valor(new BigDecimal("0.00"));
+                    if (row.get("entrada") != null) {
+                        valor = new Valor((BigDecimal) row.get("entrada"));
+                    }else if (row.get("saida") != null) {
+                        valor = new Valor((BigDecimal) row.get("saida"));
+                    }else if (row.get("valor") != null) {
+                        valor = new Valor((BigDecimal) row.get("valor"));
+                    }
+
+                    LctoTemplate lcto = new LctoTemplate(
+                            Dates.Dates.getCalendarInThisStringFormat((Calendar) row.get("data"), "dd/MM/yyyy"),
+                            (String) row.get("documento"),
+                            (String) row.get("prefixo"),
+                            (String) row.get("historico"),
+                            valor
+                    );
+                }
+                );
+            }
         }
 
         cfg.getLctos().addAll(lctos);

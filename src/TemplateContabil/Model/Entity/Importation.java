@@ -57,6 +57,9 @@ public class Importation {
         this.TIPO = TIPO;
     }
 
+    /**
+     * mapa de configuração de colunas
+     */
     public Map<String, Map<String, String>> getXlsxCols() {
         return xlsxCols;
     }
