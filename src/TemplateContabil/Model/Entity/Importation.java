@@ -18,6 +18,7 @@ public class Importation {
     private String nome = "";
     private String idTemplateConfig;
     private final Map<String, String> excelCols = new HashMap<>();
+    private final Map<String, Map<String, String>> xlsxCols = new HashMap<>();
     private final List<LctoTemplate> lctos = new ArrayList<>();
 
     /**
@@ -54,6 +55,10 @@ public class Importation {
 
     public void setTIPO(int TIPO) {
         this.TIPO = TIPO;
+    }
+
+    public Map<String, Map<String, String>> getXlsxCols() {
+        return xlsxCols;
     }
 
     /**
