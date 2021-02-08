@@ -91,6 +91,8 @@ public final class ImportationModel {
             } else {
                 //Pega Lctos
                 List<Map<String, Object>> rows = JExcel.XLSX.get(cfg.getFile(), cfg.getXlsxCols());
+                
+                Object[] objLctos = new Object[]{lctos};
 
                 //Transforma em Lctos
                 rows.forEach((row) -> {
@@ -111,6 +113,8 @@ public final class ImportationModel {
                             (String) row.getOrDefault("historico", ""),
                             valor
                     );
+                    
+                    ((List<LctoTemplate>) objLctos[0]).add(lcto);
                 }
                 );
             }
