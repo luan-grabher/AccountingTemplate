@@ -98,17 +98,17 @@ public final class ImportationModel {
                     Valor valor = new Valor(new BigDecimal("0.00"));
                     if (row.get("entrada") != null) {
                         valor = new Valor((BigDecimal) row.get("entrada"));
-                    }else if (row.get("saida") != null) {
+                    } else if (row.get("saida") != null) {
                         valor = new Valor((BigDecimal) row.get("saida"));
-                    }else if (row.get("valor") != null) {
+                    } else if (row.get("valor") != null) {
                         valor = new Valor((BigDecimal) row.get("valor"));
                     }
 
                     LctoTemplate lcto = new LctoTemplate(
                             Dates.Dates.getCalendarInThisStringFormat((Calendar) row.get("data"), "dd/MM/yyyy"),
-                            (String) row.get("documento"),
-                            (String) row.get("prefixo"),
-                            (String) row.get("historico"),
+                            (String) row.getOrDefault("documento", ""),
+                            (String) row.getOrDefault("prefixo", ""),
+                            (String) row.getOrDefault("historico", ""),
                             valor
                     );
                 }
