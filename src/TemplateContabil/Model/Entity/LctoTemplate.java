@@ -75,9 +75,10 @@ public class LctoTemplate {
     }
 
     public String getHistorico() {
-        String historico = documento.equals("") ? "" : documento + " - ";
-        historico += prefixoHistorico.equals("") ? "" : prefixoHistorico + " ";
-        historico += complementoHistorico;
+        String historico = "";
+        if (documento != null) historico += documento.equals("") ? "" : documento + " - ";        
+        if (prefixoHistorico != null) historico += prefixoHistorico.equals("") ? "" : prefixoHistorico + " ";
+        if (complementoHistorico != null) historico += complementoHistorico;
         historico = removerAcentos(historico);
         historico = historico.replaceAll("[^a-zA-Z0-9-./ ]", " ");
         return historico;
