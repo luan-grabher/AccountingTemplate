@@ -95,7 +95,7 @@ public class Template {
                 row.getCell(0).setCellValue(lcto.getData());
                 row.getCell(1).setCellValue(lcto.getDocumento());
                 row.getCell(2).setCellValue(lcto.getHistorico());
-                row.getCell(6).setCellValue(lcto.getValor().getDouble());
+                row.getCell(6).setCellValue(lcto.getValor().doubleValue());
                 row.getCell(7).setCellValue(lcto.getEntrada_Saida());
             }
         });

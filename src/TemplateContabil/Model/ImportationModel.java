@@ -5,7 +5,6 @@
  */
 package TemplateContabil.Model;
 
-import Auxiliar.Valor;
 import Entity.ErrorIgnore;
 import Entity.Warning;
 import Robo.View.roboView;
