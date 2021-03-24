@@ -1,6 +1,6 @@
 package TemplateContabil.Model.Entity;
 
-import Auxiliar.Valor;
+import java.math.BigDecimal;
 import java.text.Normalizer;
 
 public class LctoTemplate {
@@ -9,12 +9,12 @@ public class LctoTemplate {
     private String documento = "";
     private String prefixoHistorico = "";
     private String complementoHistorico = "";
-    private Valor valor =  new Valor(0);
+    private BigDecimal valor =  new BigDecimal("0.00");
     private String entrada_Saida = "E";
 
 
 
-    public LctoTemplate(String data, String documento, String prefixoHistorico, String complementoHistorico, Valor valor) {
+    public LctoTemplate(String data, String documento, String prefixoHistorico, String complementoHistorico, BigDecimal valor) {
         this.data = data;
         this.documento = documento;
         this.prefixoHistorico = prefixoHistorico;
@@ -41,8 +41,9 @@ public class LctoTemplate {
 
     private void setEntrada_Saida() {
         //Entrada ou Saida e Valor
-        if (valor.getString().contains("-")) {
-            valor.setString(valor.getString().replaceAll("-", ""));
+        if (valor.compareTo(BigDecimal.ZERO) == 1) {
+            /*Transforma em positivo pois só usamos positivos*/
+            valor = valor.negate();           
             entrada_Saida = "S";
         } else {
             entrada_Saida = "E";
@@ -65,7 +66,7 @@ public class LctoTemplate {
         return complementoHistorico;
     }
 
-    public Valor getValor() {
+    public BigDecimal getValor() {
         return valor;
     }
 

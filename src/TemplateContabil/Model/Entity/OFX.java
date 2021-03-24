@@ -1,8 +1,8 @@
 package TemplateContabil.Model.Entity;
 
-import Auxiliar.Valor;
 import fileManager.FileManager;
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +26,7 @@ public class OFX {
                 if (!linha.equals("")) {
                     //Adiciona lcto
                     if (linha.contains("</STMTTRN>") && !data.equals("") && !historico.equals("") && !valor.equals("")) {
-                        lctos.add(new LctoTemplate(data, "", "", historico, new Valor(valor)));
+                        lctos.add(new LctoTemplate(data, "", "", historico, new BigDecimal(valor)));
                         data = "";
                         historico = "";
                         valor = "";
