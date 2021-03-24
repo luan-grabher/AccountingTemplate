@@ -94,52 +94,59 @@ public class ControleTemplates {
         @Override
         public void run() {
             File file = Selector.getFileOnFolder(pastaPrincipal, filtroArquivo, "");
-            
+
             //Se encontrar o arquivo
-            if(file != null){
+            if (file != null) {
                 //Verifica se é PDF para converter
-                if(file.getAbsolutePath().toLowerCase().endsWith(".pdf")){
+                if (file.getAbsolutePath().toLowerCase().endsWith(".pdf")) {
                     //Converte em XLSX
                     file = convertPdfToExcel(file);
                 }
-                
+
                 importation.setFile(file);
-            }else{
-                throw new Error("Não foi encontrado o arquivo '" + filtroArquivo + "' na pasta " + roboView.link(pastaPrincipal) );
+            } else {
+                throw new Error("Não foi encontrado o arquivo '" + filtroArquivo + "' na pasta " + roboView.link(pastaPrincipal));
             }
         }
     }
-    
-    public File convertPdfToExcel(File pdfFile){
-        Document doc =  new Document(pdfFile.getAbsolutePath());
+
+    public File convertPdfToExcel(File pdfFile) {
+        Document doc = new Document(pdfFile.getAbsolutePath());
         // Set Excel options
         ExcelSaveOptions options = new ExcelSaveOptions();
         // Set output format
         options.setFormat(ExcelSaveOptions.ExcelFormat.XLSX);
         // Set minimizing option
         options.setMinimizeTheNumberOfWorksheets(true);
-        
+
         //Setr new file xlsx
-        File newFile = new File(pdfFile.getAbsolutePath().replaceAll(".PDF",".pdf").replaceAll(".pdf", ".xlsx"));
-        
+        File newFile = new File(pdfFile.getAbsolutePath().replaceAll(".PDF", ".pdf").replaceAll(".pdf", ".xlsx"));
+
         // Convert PDF to XLSX
         doc.save(newFile.getAbsolutePath(), options);
-        
+
         return newFile;
     }
 
     public class converterArquivoParaTemplate extends Executavel {
 
         private final Importation importation;
+        private final Importation comparar;
 
         public converterArquivoParaTemplate(Importation importation) {
             this.importation = importation;
+            this.comparar = null;
+        }
+
+        public converterArquivoParaTemplate(Importation importation, Importation comparar) {
+            this.importation = importation;
+            this.comparar = comparar;
         }
 
         @Override
         public void run() {
             //Chama o modelo da importação que irá criar o template e gerar warning se algo der errado
-            ImportationModel modelo = new ImportationModel(importation.getNome(), mes, ano, importation, null);
+            ImportationModel modelo = new ImportationModel(importation.getNome(), mes, ano, importation, comparar);
             modelo.criarTemplateDosLancamentos(importation);
         }
     }
