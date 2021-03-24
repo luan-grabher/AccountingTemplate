@@ -1,7 +1,7 @@
 package TemplateContabil.Model;
 
+import Dates.Dates;
 import TemplateContabil.Model.Entity.LctoTemplate;
-import Auxiliar.Valor;
 import Entity.ErrorIgnore;
 import JExcel.JExcel;
 import Robo.View.roboView;
@@ -86,12 +86,11 @@ public class ExtratoExcel {
                     Cell celData = row.getCell(JExcel.Cell(colunaData));
                     //Se a celula da data existir
                     if (celData != null) {
-                        String celDateValueString = JExcel.getStringCell(celData);
-                        Valor data = new Valor(celDateValueString);
-                        if (data.éUmaDataValida() || (!celDateValueString.equals("") && JExcel.isDateCell(celData))) {
+                        String dateStr = JExcel.getStringCell(celData);                        
+                        if (Dates.isDateInThisFormat(dateStr, "dd/MM/yyyy") || (!dateStr.equals("") && JExcel.isDateCell(celData))) {
                             //Converte Data se for data excel
-                            if (!data.éUmaDataValida()) {
-                                data.setString(JExcel.getStringDate(Integer.valueOf(data.getNumbersList().get(0))));
+                            if (!Dates.isDateInThisFormat(dateStr, "dd/MM/yyyy")) {
+                                dateStr = JExcel.getStringDate(Integer.valueOf(dateStr));
                             }
 
                             String doc = "";
@@ -178,7 +177,7 @@ public class ExtratoExcel {
 
                             //Se valor for diferente de zero
                             if (value.compareTo(BigDecimal.ZERO) != 0) {
-                                lctos.add(new LctoTemplate(data.getString(), doc, preTexto, complemento, new Valor(value)));
+                                lctos.add(new LctoTemplate(dateStr, doc, preTexto, complemento, value));
                             }
                         }
                     }

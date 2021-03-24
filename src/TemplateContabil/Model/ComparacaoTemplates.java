@@ -1,21 +1,31 @@
 package TemplateContabil.Model;
 
 import TemplateContabil.Model.Entity.LctoTemplate;
-import Auxiliar.Valor;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ComparacaoTemplates {
 
+    /**
+     * Retorna a diferença por dia de duas listas de lctos
+     *
+     * @param lctos1 Lista de lctos 1
+     * @param lctos2 Lista de lctos 2
+     * @param nome1 Nome dos lançamentos 1
+     * @param nome2 Nome dos lançamentos 2
+     *
+     */
     public static String getComparacaoString(String nome1, String nome2, List<LctoTemplate> lctos1, List<LctoTemplate> lctos2) {
         StringBuilder r = new StringBuilder();
 
-        List<List<Valor>> diferencaDias = new ArrayList<>();
-        BigDecimal totalLctos1 = new BigDecimal("0").setScale(2, RoundingMode.CEILING);
-        BigDecimal totalLctos2 = new BigDecimal("0").setScale(2, RoundingMode.CEILING);
+        Map<Integer, Map<String, BigDecimal>> diferencaDias = new LinkedHashMap<>();
+        BigDecimal totalLctos1 = new BigDecimal("0").setScale(2, RoundingMode.HALF_UP);
+        BigDecimal totalLctos2 = new BigDecimal("0").setScale(2, RoundingMode.HALF_UP);
 
         //Faz soma total por cada dia se tiver diferenca adiciona diferença
         for (int dia = 1; dia <= 31; dia++) {
@@ -24,28 +34,27 @@ public class ComparacaoTemplates {
             String diaMMBarra = (dia < 10 ? "0" : "") + diaBarra;
 
             //Pega soma do dia sem zero na frente
-            BigDecimal somaDiaLctos1 = getSumFromDayLcto(diaBarra, lctos1).setScale(2, RoundingMode.CEILING);
-            BigDecimal somaDiaLctos2 = getSumFromDayLcto(diaBarra, lctos2).setScale(2, RoundingMode.CEILING);
+            BigDecimal somaDiaLctos1 = getSumFromDayLcto(diaBarra, lctos1).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal somaDiaLctos2 = getSumFromDayLcto(diaBarra, lctos2).setScale(2, RoundingMode.HALF_UP);
 
             //Pega soma do dia com zero na frente
             if (!diaBarra.equals(diaMMBarra)) {
-                somaDiaLctos1 = somaDiaLctos1.add(getSumFromDayLcto(diaMMBarra, lctos1)).setScale(2, RoundingMode.CEILING);
-                somaDiaLctos2 = somaDiaLctos2.add(getSumFromDayLcto(diaMMBarra, lctos2)).setScale(2, RoundingMode.CEILING);
+                somaDiaLctos1 = somaDiaLctos1.add(getSumFromDayLcto(diaMMBarra, lctos1)).setScale(2, RoundingMode.HALF_UP);
+                somaDiaLctos2 = somaDiaLctos2.add(getSumFromDayLcto(diaMMBarra, lctos2)).setScale(2, RoundingMode.HALF_UP);
             }
 
             //Soma aos totais
-            totalLctos1 = totalLctos1.add(somaDiaLctos1).setScale(2, RoundingMode.CEILING);
-            totalLctos2 = totalLctos2.add(somaDiaLctos2).setScale(2, RoundingMode.CEILING);
+            totalLctos1 = totalLctos1.add(somaDiaLctos1).setScale(2, RoundingMode.HALF_UP);
+            totalLctos2 = totalLctos2.add(somaDiaLctos2).setScale(2, RoundingMode.HALF_UP);
 
             //Adiciona diferença
             if (somaDiaLctos1.compareTo(somaDiaLctos2) != 0) {
-                List<Valor> diferenca = new ArrayList<>();
-                diferenca.add(new Valor(String.valueOf(dia), "dia"));
-                diferenca.add(new Valor(somaDiaLctos1.toString(), nome1));
-                diferenca.add(new Valor(somaDiaLctos2.toString(), nome2));
-                diferenca.add(new Valor(somaDiaLctos1.subtract(somaDiaLctos2).toString(), "diferença"));
+                Map<String, BigDecimal> diff = new HashMap<>();
+                diff.put("lctos1", somaDiaLctos1);
+                diff.put("lctos2", somaDiaLctos2);
+                diff.put("diferenca", somaDiaLctos1.subtract(somaDiaLctos2));
 
-                diferencaDias.add(diferenca);
+                diferencaDias.put(dia, diff);
             }
         }
 
@@ -71,17 +80,15 @@ public class ComparacaoTemplates {
             StringBuilder linhasTable = new StringBuilder();
             linhasTable.append(tr(td("Dia") + td(nome1) + td(nome2) + td("Diferença")));
 
-            diferencaDias.forEach((diferencaDia) -> {
-                if(!diferencaDia.get(1).getString().equals(diferencaDia.get(2).getString())){
-                    linhasTable.append(
-                            tr(
-                                    td(diferencaDia.get(0).getString())
-                                    + td(showBigDecimal(diferencaDia.get(1).getBigDecimal()))
-                                    + td(showBigDecimal(diferencaDia.get(2).getBigDecimal()))
-                                    + td(showBigDecimal(diferencaDia.get(3).getBigDecimal()))
-                            )
-                    );
-                }
+            diferencaDias.forEach((dia, values) -> {
+                linhasTable.append(
+                        tr(
+                                td(dia.toString())
+                                + td(showBigDecimal(values.get("lctos1")))
+                                + td(showBigDecimal(values.get("lctos2")))
+                                + td(showBigDecimal(values.get("diferenca")))
+                        )
+                );
             });
 
             r.append(table(linhasTable.toString()));
@@ -89,16 +96,24 @@ public class ComparacaoTemplates {
         }
 
         //System.out.println(r.toString().replaceAll("<br>", "\n").replaceAll("</tr>", "\n"));
-
         return r.toString();
     }
 
     private static BigDecimal getSumFromDayLcto(String day, List<LctoTemplate> lctos) {
-        return new BigDecimal(String.valueOf(lctos.stream().filter(l -> l.getData().substring(0, day.length()).equals(day)).mapToDouble(l -> l.getValor().getDouble()).sum()));
+        BigDecimal[] sum = new BigDecimal[]{new BigDecimal("0.00")};
+        
+        lctos.forEach((l) ->{
+            //Se for o dia
+            if(l.getData().startsWith(day + "/")){
+                sum[0] = sum[0].add(l.getValor());
+            }
+        });
+        
+        return sum[0];
     }
 
     private static String showBigDecimal(BigDecimal big) {
-        return NumberFormat.getCurrencyInstance().format(big.setScale(2, RoundingMode.CEILING));
+        return NumberFormat.getCurrencyInstance().format(big.setScale(2, RoundingMode.HALF_UP));
     }
 
     private static String table(String trs) {
