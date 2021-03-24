@@ -93,6 +93,8 @@ public class ComparacaoTemplates {
 
             r.append(table(linhasTable.toString()));
             r.append(br());
+        }else{
+            r.append("Nenhuma diferença encontrada entre os arquivos");
         }
 
         //System.out.println(r.toString().replaceAll("<br>", "\n").replaceAll("</tr>", "\n"));

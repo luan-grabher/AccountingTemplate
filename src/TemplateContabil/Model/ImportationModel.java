@@ -10,6 +10,7 @@ import Entity.Warning;
 import Robo.View.roboView;
 import TemplateContabil.Model.Entity.Importation;
 import TemplateContabil.Model.Entity.LctoTemplate;
+import fileManager.FileManager;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -50,6 +51,9 @@ public final class ImportationModel {
         if (cfgComparar != null) {
             List<LctoTemplate> comparar = getLctosFromFile(cfgComparar);
             resultadoComparacao = ComparacaoTemplates.getComparacaoString(this.nomeBanco, cfgComparar.getFile().getName(), lancamentos, comparar);
+            
+            //Salva comparação em um arquivo na mesma pasta
+            FileManager.save(cfg.getFile().getParentFile(), "Comparação " + cfg.getNome() + " VS " + cfgComparar.getNome() + ".html", resultadoComparacao);
         }
     }
 
