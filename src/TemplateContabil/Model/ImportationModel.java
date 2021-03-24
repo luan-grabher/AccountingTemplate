@@ -96,13 +96,13 @@ public final class ImportationModel {
                 //Transforma em Lctos
                 rows.forEach((row) -> {
                     //Define o valor
-                    Valor valor = new Valor(new BigDecimal("0.00"));
+                    BigDecimal valor = new BigDecimal("0.00");
                     if (row.get("entrada") != null) {
-                        valor = new Valor((BigDecimal) row.get("entrada"));
+                        valor = (BigDecimal) row.get("entrada");
                     } else if (row.get("saida") != null) {
-                        valor = new Valor((BigDecimal) row.get("saida"));
+                        valor = (BigDecimal) row.get("saida");
                     } else if (row.get("valor") != null) {
-                        valor = new Valor((BigDecimal) row.get("valor"));
+                        valor = (BigDecimal) row.get("valor");
                     }
 
                     LctoTemplate lcto = new LctoTemplate(
