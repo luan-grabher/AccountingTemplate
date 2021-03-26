@@ -68,7 +68,7 @@ public final class ImportationModel {
      * @param cfg Configuração da importação, OFX/Excel, arquivo
      * @return Retorna lista de lançamentos do arquivo da importação
      */
-    private List<LctoTemplate> getLctosFromFile(Importation cfg) {
+    public static List<LctoTemplate> getLctosFromFile(Importation cfg) {
         List<LctoTemplate> lctos = new ArrayList<>();
 
         if (cfg.getTIPO() == Importation.TIPO_OFX) {
