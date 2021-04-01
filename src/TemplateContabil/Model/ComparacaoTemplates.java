@@ -93,7 +93,7 @@ public class ComparacaoTemplates {
 
             r.append(table(linhasTable.toString()));
             r.append(br());
-        }else{
+        } else {
             r.append("Nenhuma diferença encontrada entre os arquivos");
         }
 
@@ -103,14 +103,19 @@ public class ComparacaoTemplates {
 
     private static BigDecimal getSumFromDayLcto(String day, List<LctoTemplate> lctos) {
         BigDecimal[] sum = new BigDecimal[]{new BigDecimal("0.00")};
-        
-        lctos.forEach((l) ->{
+
+        lctos.forEach((l) -> {
             //Se for o dia
-            if(l.getData().startsWith(day)){
-                sum[0] = sum[0].add(l.getValor());
+            if (l.getData().startsWith(day)) {
+                BigDecimal val = l.getValor();
+                if (l.getEntrada_Saida().equals("S")) {
+                    val = val.negate();
+                }
+
+                sum[0] = sum[0].add(val);
             }
         });
-        
+
         return sum[0];
     }
 
