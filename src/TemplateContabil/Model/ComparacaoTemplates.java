@@ -106,7 +106,7 @@ public class ComparacaoTemplates {
         
         lctos.forEach((l) ->{
             //Se for o dia
-            if(l.getData().startsWith(day + "/")){
+            if(l.getData().startsWith(day)){
                 sum[0] = sum[0].add(l.getValor());
             }
         });
