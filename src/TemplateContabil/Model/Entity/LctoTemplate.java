@@ -40,12 +40,14 @@ public class LctoTemplate {
     }
 
     private void setEntrada_Saida() {
-        //Entrada ou Saida e Valor
-        if (valor.compareTo(BigDecimal.ZERO) == 1) {
+        //Se o valor for menor que zero
+        if (valor.compareTo(BigDecimal.ZERO) == -1) {
             /*Transforma em positivo pois só usamos positivos*/
-            valor = valor.negate();           
+            valor = valor.negate();    
+            //define que é saida
             entrada_Saida = "S";
         } else {
+            //define que é entrada
             entrada_Saida = "E";
         }
     }
