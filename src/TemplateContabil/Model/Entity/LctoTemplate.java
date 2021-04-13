@@ -51,7 +51,7 @@ public class LctoTemplate {
             entrada_Saida = "E";
         }
     }
-     
+
     public String getPrefixoHistorico() {
         return prefixoHistorico;
     }
