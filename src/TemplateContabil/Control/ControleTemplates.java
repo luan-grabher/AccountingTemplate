@@ -93,7 +93,7 @@ public class ControleTemplates {
 
         @Override
         public void run() {
-            File file = Selector.getFileOnFolder(pastaPrincipal, filtroArquivo, "");
+            File file = Selector.getFileOnFolder(pastaPrincipal, filtroArquivo);
 
             //Se encontrar o arquivo
             if (file != null) {
