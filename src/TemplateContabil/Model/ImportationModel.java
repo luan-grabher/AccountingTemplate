@@ -51,7 +51,7 @@ public final class ImportationModel {
         if (cfgComparar != null) {
             List<LctoTemplate> comparar = getLctosFromFile(cfgComparar);
             resultadoComparacao = ComparacaoTemplates.getComparacaoString(this.nomeBanco, cfgComparar.getFile().getName(), lancamentos, comparar);
-            
+
             //Salva comparação em um arquivo na mesma pasta
             FileManager.save(cfg.getFile().getParentFile(), "Comparação " + cfg.getNome() + " VS " + cfgComparar.getNome() + ".html", resultadoComparacao);
         }
@@ -94,7 +94,7 @@ public final class ImportationModel {
             } else {
                 //Pega Lctos
                 List<Map<String, Object>> rows = JExcel.XLSX.get(cfg.getFile(), cfg.getXlsxCols());
-                
+
                 Object[] objLctos = new Object[]{lctos};
 
                 //Transforma em Lctos
@@ -102,9 +102,19 @@ public final class ImportationModel {
                     //Define o valor
                     BigDecimal valor = new BigDecimal("0.00");
                     if (row.get("entrada") != null) {
-                        valor = (BigDecimal) row.get("entrada");
+                        BigDecimal entrada = (BigDecimal) row.get("entrada");
+                        if (BigDecimal.ZERO.compareTo(entrada) < 0) {
+                            entrada = entrada.negate();
+                        }
+
+                        valor = entrada;
                     } else if (row.get("saida") != null) {
-                        valor = (BigDecimal) row.get("saida");
+                        BigDecimal saida = (BigDecimal) row.get("saida");
+                        if (BigDecimal.ZERO.compareTo(saida) >= 0) {
+                            saida = saida.negate();
+                        }
+
+                        valor = saida;
                     } else if (row.get("valor") != null) {
                         valor = (BigDecimal) row.get("valor");
                     }
@@ -116,7 +126,7 @@ public final class ImportationModel {
                             (String) row.getOrDefault("historico", ""),
                             valor
                     );
-                    
+
                     ((List<LctoTemplate>) objLctos[0]).add(lcto);
                 }
                 );
