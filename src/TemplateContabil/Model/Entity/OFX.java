@@ -20,16 +20,18 @@ public class OFX {
             String data = "";
             String historico = "";
             String valor = "";
+            String doc = "";
 
             //Percorre todas linhas para ir acumulando os valores
             for (String linha : linhas) {
                 if (!linha.equals("")) {
                     //Adiciona lcto
                     if (linha.contains("</STMTTRN>") && !data.equals("") && !historico.equals("") && !valor.equals("")) {
-                        lctos.add(new LctoTemplate(data, "", "", historico, new BigDecimal(valor)));
+                        lctos.add(new LctoTemplate(data, doc, "", historico, new BigDecimal(valor)));
                         data = "";
                         historico = "";
                         valor = "";
+                        doc = "";
 
                         //Data
                     } else if (!getValorParametro("<DTPOSTED>", linha).equals("")) {
@@ -42,6 +44,9 @@ public class OFX {
                         //Historico
                     } else if (!getValorParametro("<MEMO>", linha).equals("")) {
                         historico = valorLinha;
+                    }else if(!getValorParametro("<CHECKNUM>", linha).equals("")){
+                        doc = valorLinha;
+                    
                     }
 
                 }
