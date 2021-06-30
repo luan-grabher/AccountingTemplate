@@ -118,10 +118,20 @@ public final class ImportationModel {
                     } else if (row.get("valor") != null) {
                         valor = (BigDecimal) row.get("valor");
                     }
+                    
+                    String doc = "";
+                    Object docObj = row.getOrDefault("documento", "");
+                    if(docObj == null){
+                        docObj = "";
+                    }else if(docObj.getClass() == BigDecimal.class){
+                        docObj = ((BigDecimal) docObj).toPlainString();
+                        docObj = ((String) docObj).replaceAll("\\.[0-9]*", "");
+                    }
+                    doc = (String) docObj;
 
                     LctoTemplate lcto = new LctoTemplate(
                             Dates.Dates.getCalendarInThisStringFormat((Calendar) row.get("data"), "dd/MM/yyyy"),
-                            (String) row.getOrDefault("documento", ""),
+                            doc,
                             (String) row.getOrDefault("prefixo", ""),
                             (String) row.getOrDefault("historico", ""),
                             valor
