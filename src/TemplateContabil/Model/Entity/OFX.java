@@ -40,6 +40,10 @@ public class OFX {
                         //Valor
                     } else if (!getValorParametro("<TRNAMT>", linha).equals("")) {
                         valor = valorLinha;
+                        //Se tiver virgula
+                        if (valor.indexOf(".") < valor.indexOf(",")) {
+                            valor = valor.replaceAll("\\.", "").replaceAll("\\,", ".");
+                        }
 
                         //Historico
                     } else if (!getValorParametro("<MEMO>", linha).equals("")) {
