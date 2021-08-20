@@ -101,14 +101,16 @@ public final class ImportationModel {
                 rows.forEach((row) -> {
                     //Define o valor
                     BigDecimal valor = new BigDecimal("0.00");
-                    if (row.get("entrada") != null) {
+                    //Se tiver saida  e não for null e a saida não for 0
+                    if (row.get("entrada") != null && BigDecimal.ZERO.compareTo((BigDecimal) row.get("entrada")) != 0 ) {
                         BigDecimal entrada = (BigDecimal) row.get("entrada");
                         if (BigDecimal.ZERO.compareTo(entrada) < 0) {
                             entrada = entrada.negate();
                         }
 
                         valor = entrada;
-                    } else if (row.get("saida") != null) {
+                    }//Se tiver saida  e não for null e a saida não for 0
+                    else if (row.get("saida") != null  && BigDecimal.ZERO.compareTo((BigDecimal) row.get("saida")) != 0 ) {
                         BigDecimal saida = (BigDecimal) row.get("saida");
                         if (BigDecimal.ZERO.compareTo(saida) >= 0) {
                             saida = saida.negate();
