@@ -1,0 +1,8 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "c:\\Users\\Administrador\\Documents\\Projetos\\Moresco\\JExcel\\dist\\JExcel.jar",
+        "c:\\Users\\Administrador\\Documents\\Projetos\\Moresco\\JExcel\\libs/**/*.jar",
+        "c:\\Users\\Administrador\\Documents\\Projetos\\Moresco\\Robots\\Robots.jar"
+    ]
+}
