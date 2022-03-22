@@ -8,8 +8,27 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Calendar;
+
+import Dates.Dates;
 
 public class ComparacaoTemplates {
+
+    //static month to filter
+    private static Integer month = null;
+
+    //static year to filter
+    private static Integer year = null;
+
+    //public set month to filter
+    public static void setMonth(Integer month) {
+        ComparacaoTemplates.month = month;
+    }
+
+    //public set year to filter
+    public static void setYear(Integer year) {
+        ComparacaoTemplates.year = year;
+    }
 
     /**
      * Retorna a diferença por dia de duas listas de lctos
@@ -29,19 +48,9 @@ public class ComparacaoTemplates {
 
         //Faz soma total por cada dia se tiver diferenca adiciona diferença
         for (int dia = 1; dia <= 31; dia++) {
-
-            String diaBarra = dia + "/";
-            String diaMMBarra = (dia < 10 ? "0" : "") + diaBarra;
-
             //Pega soma do dia sem zero na frente
-            BigDecimal somaDiaLctos1 = getSumFromDayLcto(diaBarra, lctos1).setScale(2, RoundingMode.HALF_UP);
-            BigDecimal somaDiaLctos2 = getSumFromDayLcto(diaBarra, lctos2).setScale(2, RoundingMode.HALF_UP);
-
-            //Pega soma do dia com zero na frente
-            if (!diaBarra.equals(diaMMBarra)) {
-                somaDiaLctos1 = somaDiaLctos1.add(getSumFromDayLcto(diaMMBarra, lctos1)).setScale(2, RoundingMode.HALF_UP);
-                somaDiaLctos2 = somaDiaLctos2.add(getSumFromDayLcto(diaMMBarra, lctos2)).setScale(2, RoundingMode.HALF_UP);
-            }
+            BigDecimal somaDiaLctos1 = getSumFromDayLcto(dia, lctos1).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal somaDiaLctos2 = getSumFromDayLcto(dia, lctos2).setScale(2, RoundingMode.HALF_UP);
 
             //Soma aos totais
             totalLctos1 = totalLctos1.add(somaDiaLctos1).setScale(2, RoundingMode.HALF_UP);
@@ -101,20 +110,31 @@ public class ComparacaoTemplates {
         return r.toString();
     }
 
-    private static BigDecimal getSumFromDayLcto(String day, List<LctoTemplate> lctos) {
+    private static BigDecimal getSumFromDayLcto(Integer day, List<LctoTemplate> lctos) {
         BigDecimal[] sum = new BigDecimal[]{new BigDecimal("0.00")};
 
-        lctos.forEach((l) -> {
-            //Se for o dia
-            if (l.getData().startsWith(day)) {
-                BigDecimal val = l.getValor();
-                if (l.getEntrada_Saida().equals("S")) {
-                    val = val.negate();
-                }
-
-                sum[0] = sum[0].add(val);
+        //for each lcto
+        for (LctoTemplate lcto : lctos) {
+            try {
+                Calendar cal = Dates.getCalendarFromFormat(lcto.getData(), "dd/MM/yyyy");
+                //if month is null or month is equal to lcto month and year is null or year is equal to lcto year
+                if (month == null || (month != null && month.equals(cal.get(Calendar.MONTH) + 1))) {
+                    if (year == null || (year != null && year.equals(cal.get(Calendar.YEAR)))) {
+                        //if day converted to int is equal to lcto day
+                        if (day == cal.get(Calendar.DAY_OF_MONTH)) {
+                            BigDecimal val = lcto.getValor();
+                            if (lcto.getEntrada_Saida().equals("S")) {
+                                val = val.negate();
+                            }
+            
+                            sum[0] = sum[0].add(val);
+                        }
+                    }
+                }   
+            } catch (Exception e) {
+                
             }
-        });
+        }
 
         return sum[0];
     }
