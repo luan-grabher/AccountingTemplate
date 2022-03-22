@@ -128,6 +128,23 @@ public class ControleTemplates {
         return newFile;
     }
 
+    //class to get lctos from importation file
+    public class getLctosFromImportationFile extends Executavel {
+
+        private final Importation importation;
+
+        public getLctosFromImportationFile(Importation importation) {
+            this.importation = importation;
+        }
+
+        @Override
+        public void run() {
+            //Chama o modelo da importação que irá criar o template e gerar warning se algo der errado
+            ImportationModel.getLctosFromFile(importation);
+            ImportationModel modelo = new ImportationModel(importation.getNome(), mes, ano, importation, null);
+        }
+    }
+
     public class converterArquivoParaTemplate extends Executavel {
 
         private final Importation importation;

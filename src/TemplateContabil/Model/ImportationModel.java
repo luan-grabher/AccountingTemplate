@@ -156,6 +156,18 @@ public final class ImportationModel {
      * @param cfg Configuração da importação com os lançamentos
      */
     public void criarTemplateDosLancamentos(Importation cfg) {
+        createImportationTemplate(cfg, month, year);
+    }
+
+        /**
+     * Criar arquivo Template dos lançamentos na mesma pasta do arquivo dos
+     * lançamentos
+     *
+     * @param cfg Configuração da importação com os lançamentos
+     * @param month Mes, pode ficar nulo para nao filtrar
+     * @param year Ano, pode ficar nulo para nao filtrar
+     */
+    public static void createImportationTemplate(Importation cfg, Integer month, Integer year) {
         //Cria arquivo
         String nomeArquivoSalvo = cfg.getNome() + ".xlsm";
 
@@ -169,9 +181,9 @@ public final class ImportationModel {
                 cfg.getLctos());
 
         if (template.criarTemplateXlsm()) {
-            throw new Warning("Template do banco " + nomeBanco + " salvo em " + roboView.link(arquivoSalvo.getParentFile()));
+            throw new Warning("Template " + cfg.getNome() + " salvo em " + roboView.link(arquivoSalvo.getParentFile()));
         } else {
-            throw new ErrorIgnore("Erro ao salvar o template do banco '" + nomeBanco + "' na pasta " + roboView.link(arquivoSalvo.getParentFile()));
+            throw new ErrorIgnore("Erro ao salvar o template '" + cfg.getNome() + "' na pasta " + roboView.link(arquivoSalvo.getParentFile()));
         }
     }
 }

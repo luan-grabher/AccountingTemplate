@@ -47,7 +47,12 @@ public class OFX {
 
                         //Historico
                     } else if (!getValorParametro("<MEMO>", linha).equals("")) {
-                        historico = valorLinha;
+                        //if historico nao for vazio, adiciona o valorLinha, se historico for vazio, adiciona o valorLinha
+                        if (!historico.equals("")) {
+                            historico += " " + valorLinha;
+                        } else {
+                            historico = valorLinha;
+                        }
                     }else if(!getValorParametro("<CHECKNUM>", linha).equals("")){
                         doc = valorLinha;
                     
