@@ -1,15 +1,22 @@
 package TemplateContabil.Model;
 
 import TemplateContabil.Model.Entity.LctoTemplate;
+import fileManager.FileManager;
+
 import java.io.File;
 import java.util.List;
+import java.util.Map;
+
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-public class Template {
+import com.google.gson.Gson;
 
-    public static final File templateParaCopiar = new File("\\\\heimerdinger\\docs\\Informatica\\Programas\\Moresco\\Robos\\Contabilidade\\TemplateImportacao\\Default.xlsm");
+public class Template {
+    public static final String configFileName = "./accountingTemplate.json";
+
+    public static File templateParaCopiar;
     private final File salvarTemplateComo;
     private final String idConfig;
     private final List<LctoTemplate> lctos;
@@ -40,6 +47,38 @@ public class Template {
         this.salvarTemplateComo = salvarTemplateComo;
         this.idConfig = idConfig;
         this.lctos = lctos;
+
+        setTemplateDefaultFile();
+    }
+
+    public File setTemplateDefaultFile(){
+        File configFile = new File(configFileName);
+        if (!configFile.exists()) {
+            throw new Error("Arquivo de configuração não encontrado: " + configFile.getAbsolutePath());
+        }
+
+        //read json and parse
+        String json = FileManager.getText(configFile);
+        Map<String, Object> map = new Gson().fromJson(json, Map.class);
+
+        String serverFolder = (String) map.get("serverFolder");
+        serverFolder = serverFolder.replace(":serverName:", (String) map.get("serverName"));
+        serverFolder = serverFolder.replace(":serverPathName:", (String) map.get("serverPathName"));
+        serverFolder = serverFolder.replace(":departmentName:", (String) map.get("departmentName"));
+        serverFolder = serverFolder.replace(":programsFolderName:", (String) map.get("programsFolderName"));
+        serverFolder = serverFolder.replace(":companyName:", (String) map.get("companyName"));
+
+        String templatePath = (String) map.get("templatePath");
+        templatePath = templatePath.replace(":serverFolder:", serverFolder);
+        templatePath = templatePath.replace(":templatesFolderName:", (String) map.get("templatesFolderName"));
+        templatePath = templatePath.replace(":templateFileName:", (String) map.get("templateFileName"));
+
+        templateParaCopiar = new File(templatePath);
+        if (!templateParaCopiar.exists()) {
+            throw new Error("Template padrão não encontrado: " + templateParaCopiar.getAbsolutePath());
+        }
+
+        return templateParaCopiar;
     }
 
     /**
