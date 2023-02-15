@@ -52,26 +52,7 @@ public class Template {
     }
 
     public File setTemplateDefaultFile(){
-        File configFile = new File(configFileName);
-        if (!configFile.exists()) {
-            throw new Error("Arquivo de configuração não encontrado: " + configFile.getAbsolutePath());
-        }
-
-        //read json and parse
-        String json = FileManager.getText(configFile);
-        Map<String, Object> map = new Gson().fromJson(json, Map.class);
-
-        String serverFolder = (String) map.get("serverFolder");
-        serverFolder = serverFolder.replace(":serverName:", (String) map.get("serverName"));
-        serverFolder = serverFolder.replace(":serverPathName:", (String) map.get("serverPathName"));
-        serverFolder = serverFolder.replace(":departmentName:", (String) map.get("departmentName"));
-        serverFolder = serverFolder.replace(":programsFolderName:", (String) map.get("programsFolderName"));
-        serverFolder = serverFolder.replace(":companyName:", (String) map.get("companyName"));
-
-        String templatePath = (String) map.get("templatePath");
-        templatePath = templatePath.replace(":serverFolder:", serverFolder);
-        templatePath = templatePath.replace(":templatesFolderName:", (String) map.get("templatesFolderName"));
-        templatePath = templatePath.replace(":templateFileName:", (String) map.get("templateFileName"));
+        String templatePath = Config.config.get("templatePath");
 
         templateParaCopiar = new File(templatePath);
         if (!templateParaCopiar.exists()) {
