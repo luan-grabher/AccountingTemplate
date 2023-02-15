@@ -1,17 +1,13 @@
 package TemplateContabil.Model;
 
 import TemplateContabil.Model.Entity.LctoTemplate;
-import fileManager.FileManager;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
-import com.google.gson.Gson;
 
 public class Template {
     public static final String configFileName = "./accountingTemplate.json";
