@@ -34,9 +34,32 @@ public class Config {
         templatePath = templatePath.replace(":templatesFolderName:", (String) map.get("templatesFolderName"));
         templatePath = templatePath.replace(":templateFileName:", (String) map.get("templateFileName"));
 
+        /*
+        "escrituracaoFolder" : "\\\\:serverName:\\DOCS\\Contábil\\Clientes\\:companyFolder:\\Escrituração mensal",
+        "pastaArquivos" : ":escrituracaoFolder:\\:ano:\\:pastaAnual:\\:mes:.:ano::pastaMensal:"
+         */
+        String escrituracaoFolder = (String) map.get("escrituracaoFolder");
+        escrituracaoFolder = escrituracaoFolder.replace(":serverName:", (String) map.get("serverName"));
+
+        String pastaArquivos = (String) map.get("pastaArquivos");
+        pastaArquivos = pastaArquivos.replace(":escrituracaoFolder:", escrituracaoFolder);
+
         Map<String, String> config = new HashMap<>();
         config.put("templatePath", templatePath);
+        config.put("escrituracaoFolder", escrituracaoFolder);
+        config.put("pastaArquivos", pastaArquivos);
 
         return config;
+    }
+
+    public static String getPastaArquivos(String companyFolder, String ano, String mes, String pastaAnual, String pastaMensal){
+        String pastaArquivos = config.get("pastaArquivos");
+        pastaArquivos = pastaArquivos.replace(":companyFolder:", companyFolder);
+        pastaArquivos = pastaArquivos.replace(":ano:", ano);
+        pastaArquivos = pastaArquivos.replace(":mes:", mes);
+        pastaArquivos = pastaArquivos.replace(":pastaAnual:", pastaAnual);
+        pastaArquivos = pastaArquivos.replace(":pastaMensal:", pastaMensal);
+
+        return pastaArquivos;
     }
 }

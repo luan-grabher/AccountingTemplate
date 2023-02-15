@@ -3,6 +3,7 @@ package TemplateContabil.Control;
 import Entity.Executavel;
 import Robo.View.roboView;
 import TemplateContabil.Model.Entity.Importation;
+import TemplateContabil.Model.Config;
 import TemplateContabil.Model.ImportationModel;
 import com.aspose.pdf.Document;
 import com.aspose.pdf.ExcelSaveOptions;
@@ -16,6 +17,8 @@ public class ControleTemplates {
 
     protected File pastaPrincipal;
     protected File pastaEscMensal;
+
+    private String pastaEmpresa;
 
     /**
      * Define um controle de templates.Para que tudo funcione bem você deve
@@ -45,17 +48,17 @@ public class ControleTemplates {
      */
     public void setPasta(String pastaAnual, String pastaMensal) {
         //Coloca barra antes da pasta mensal caso exista 
-        pastaMensal = pastaMensal.equals("") ? "" : "\\" + pastaMensal;
+        if(!pastaMensal.equals("")){
+            pastaMensal = "\\" + pastaMensal;
+        }
 
-        String path = pastaEscMensal.getAbsolutePath() + "\\#ano#\\" + pastaAnual + "\\#mes#.#ano#" + pastaMensal;
+        String mesStr = (this.mes < 10 ? "0" : "") + this.mes;
+        String anoStr = "" + this.ano;
 
-        //Substitui #mes# pelo mês informado
-        path = path.replaceAll("#mes#", "" + ((this.mes < 10 ? "0" : "") + this.mes));
-        //Substitui #ano# pelo ano informado
-        path = path.replaceAll("#ano#", "" + this.ano);
+        String pastaArquivos = Config.getPastaArquivos(pastaEmpresa, anoStr, mesStr, pastaAnual, pastaMensal);
 
         //Cria variavel file da pasta principal com a string, utiliza getAbsoluteFile por algum motivo que nao sei, deixei ai
-        pastaPrincipal = new File(path).getAbsoluteFile();
+        pastaPrincipal = new File(pastaArquivos).getAbsoluteFile();
     }
 
     /**
@@ -74,7 +77,12 @@ public class ControleTemplates {
      * G:/Contabil/Clientes
      */
     public void setPastaEscMensal(String nomePastaEmpresa) {
-        pastaEscMensal = new File("\\\\HEIMERDINGER\\DOCS\\Contábil\\Clientes\\" + nomePastaEmpresa + "\\Escrituração mensal");
+        pastaEmpresa = nomePastaEmpresa;
+
+        String escrituracaoFolder = Config.config.get("escrituracaoFolder");
+        escrituracaoFolder = escrituracaoFolder.replaceAll(":companyFolder:", nomePastaEmpresa);
+
+        pastaEscMensal = new File(escrituracaoFolder);
     }
 
     /**
