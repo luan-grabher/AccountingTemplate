@@ -12,6 +12,6 @@
     "serverFolder" : "\\\\:serverName:\\:serverPathName:\\:departmentName:\\:programsFolderName:\\:companyName:",
     "templatePath" : ":serverFolder:\\:templatesFolderName:\\:templateFileName:",
     
-    "escrituracaoFolder" : "\\\\:serverName:\\DOCS\\Contábil\\Clientes\\:companyFolder:\\Escrituração mensal",
+    "escrituracaoFolder" : "\\\\:serverName:\\DOCS\\Contábil\\Clientes\\:companyFolder:\\ESCRITURACAO MENSAL",
     "pastaArquivos" : ":escrituracaoFolder:\\:ano:\\:pastaAnual:\\:mes:.:ano::pastaMensal:"
 }

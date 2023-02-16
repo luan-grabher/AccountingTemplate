@@ -19,7 +19,7 @@ public class Config {
         }
 
         //read json and parse
-        String json = FileManager.getText(configFile);
+        String json = FileManager.getText(configFile, "utf-8");
         Map<String, Object> map = new Gson().fromJson(json, Map.class);
 
         String serverFolder = (String) map.get("serverFolder");
