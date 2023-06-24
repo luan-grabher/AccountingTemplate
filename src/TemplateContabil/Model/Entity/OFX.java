@@ -13,7 +13,7 @@ public class OFX {
     public static List<LctoTemplate> getListaLctos(File arquivo) {
         List<LctoTemplate> lctos = new ArrayList<>();
         try {
-            //Ler arquivo
+            // Ler arquivo
             String textoArquivo = FileManager.getText(arquivo.getAbsolutePath()).replaceAll("\r", "");
             String[] linhas = textoArquivo.split("\n");
 
@@ -22,49 +22,84 @@ public class OFX {
             String valor = "";
             String doc = "";
 
-            //Percorre todas linhas para ir acumulando os valores
+            // Percorre todas linhas para ir acumulando os valores
             for (String linha : linhas) {
                 if (!linha.equals("")) {
-                    //Adiciona lcto
-                    if (linha.contains("</STMTTRN>") && !data.equals("") && !historico.equals("") && !valor.equals("")) {
+                    // Adiciona lcto
+                    if (linha.contains("</STMTTRN>") && !data.equals("") && !historico.equals("")
+                            && !valor.equals("")) {
                         lctos.add(new LctoTemplate(data, doc, "", historico, new BigDecimal(valor)));
                         data = "";
                         historico = "";
                         valor = "";
                         doc = "";
 
-                        //Data
+                        // Data
                     } else if (!getValorParametro("<DTPOSTED>", linha).equals("")) {
-                        data = valorLinha.substring(6, 8) + "/" + valorLinha.substring(4, 6) + "/" + valorLinha.substring(0, 4);
+                        data = valorLinha.substring(6, 8) + "/" + valorLinha.substring(4, 6) + "/"
+                                + valorLinha.substring(0, 4);
 
-                        //Valor
+                        // Valor
                     } else if (!getValorParametro("<TRNAMT>", linha).equals("")) {
                         valor = valorLinha;
-                        //Se tiver virgula
+                        // Se tiver virgula
                         if (valor.indexOf(".") < valor.indexOf(",")) {
                             valor = valor.replaceAll("\\.", "").replaceAll("\\,", ".");
                         }
 
-                        //Historico
+                        // Historico
                     } else if (!getValorParametro("<MEMO>", linha).equals("")) {
-                        //if historico nao for vazio, adiciona o valorLinha, se historico for vazio, adiciona o valorLinha
+                        // if historico nao for vazio, adiciona o valorLinha, se historico for vazio,
+                        // adiciona o valorLinha
                         if (!historico.equals("")) {
                             historico += " " + valorLinha;
                         } else {
                             historico = valorLinha;
                         }
-                    }else if(!getValorParametro("<CHECKNUM>", linha).equals("")){
+                    } else if (!getValorParametro("<CHECKNUM>", linha).equals("")) {
                         doc = valorLinha;
-                    
+
                     }
 
                 }
             }
+
+            lctos = getUniqueLancamentos(lctos);            
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         return lctos;
+    }
+
+    private static List<LctoTemplate> getUniqueLancamentos(List<LctoTemplate> lancamentos){
+        List<LctoTemplate> lancamentosUnicos = new ArrayList<>();
+            for (LctoTemplate lcto : lancamentos) {
+                String dataLcto = lcto.getData();
+                String historicoLcto = lcto.getHistorico();
+                String valorLcto = lcto.getValor().toString();
+                String docLcto = lcto.getDocumento();
+
+                boolean lctoJaExiste = false;
+                for (LctoTemplate lctoSemDuplicado : lancamentosUnicos) {
+                    boolean isSameDate = lctoSemDuplicado.getData().equals(dataLcto);
+                    boolean isSameHistorico = lctoSemDuplicado.getHistorico().equals(historicoLcto);
+                    boolean isSameValor = lctoSemDuplicado.getValor().toString().equals(valorLcto);
+                    boolean isSameDoc = lctoSemDuplicado.getDocumento().equals(docLcto);
+
+                    boolean isLancamentoIgual = isSameDate && isSameHistorico && isSameValor && isSameDoc;
+                    if (isLancamentoIgual) {
+                        lctoJaExiste = true;
+                        break;
+                    }
+                }
+
+                if (!lctoJaExiste) {
+                    lancamentosUnicos.add(lcto);
+                }
+            }
+
+            return lancamentosUnicos;
     }
 
     private static String getValorParametro(String nomeParametro, String linha) {

@@ -83,6 +83,11 @@ public class LctoTemplate {
         if (complementoHistorico != null) historico += complementoHistorico;
         historico = removerAcentos(historico);
         historico = historico.replaceAll("[^a-zA-Z0-9-./ ]", " ");
+
+        while (historico.contains("  ")) {
+            historico = historico.replaceAll("  ", " ");
+        }
+
         return historico;
     }
 
