@@ -3,6 +3,7 @@
         "lib/**/*.jar",
         "c:\\Users\\luan\\Documents\\Projetos\\Moresco\\Java-Robots\\Java-Robots.jar",
         "c:\\Users\\luan\\Documents\\Projetos\\Moresco\\JExcel\\JExcel.jar",
-        "c:\\Users\\luan\\Documents\\Projetos\\Moresco\\Jar-Vendors\\gson-2.10.1.jar"
+        "c:\\Users\\luan\\Documents\\Projetos\\Moresco\\Jar-Vendors\\gson-2.10.1.jar",
+        "c:\\Users\\luan\\Documents\\Projetos\\Moresco\\Jar-Vendors\\gson-2.9.0.jar"
     ]
 }
